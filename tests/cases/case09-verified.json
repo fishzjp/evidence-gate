@@ -1,0 +1,30 @@
+{
+  "case": 9,
+  "name": "verified",
+  "scenario": "已实际验证：先复现失败、修复后回归测试通过、独立 CI 环境全量测试通过，允许使用『已验证』",
+  "input": {
+    "conclusion": "cart 服务下单金额翻倍的 bug 已被修复（PR #512）",
+    "type": "EXPERIMENT_RESULT",
+    "claimed_strength": "verified",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "test_result",
+        "detail": "新增回归测试 test_double_charge.py：修复前在 main 上失败（复现 bug），应用 PR #512 后通过；全量 132/132 通过（CI run #33120）",
+        "group": "ci"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "1) 在未修复的 main 分支运行新回归测试，确认失败（复现）；2) 应用 PR #512 后本地与独立 CI 容器各跑一次，回归测试与全量测试均通过",
+      "env_independent": true,
+      "validates_target": true
+    },
+    "counter_evidence": [],
+    "generalization": null
+  },
+  "expected": {
+    "decision": "PASS",
+    "evidence_level": "L3"
+  }
+}

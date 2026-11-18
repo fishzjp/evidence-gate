@@ -1,0 +1,32 @@
+{
+  "case": 3,
+  "name": "fact-with-evidence",
+  "scenario": "正确事实 + 充分直接证据（官方文档，带可追溯来源）",
+  "input": {
+    "conclusion": "fastify v4 的 listen() 返回 Promise，需要 await",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "low",
+    "evidence": [
+      {
+        "kind": "official_doc",
+        "detail": "Fastify v4 官方文档 Server 一节（本地缓存副本 tests/fixtures/fastify-server.md）",
+        "group": "fastify-docs",
+        "anchor": "tests/fixtures/fastify-server.md",
+        "quote": "server.listen() returns a Promise"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "generalization": null
+  },
+  "expected": {
+    "decision": "PASS",
+    "evidence_level": "L2"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "p04",
+  "name": "hedged-correlation",
+  "expectation": "should_pass",
+  "args": [],
+  "scenario": "正例：相关性结论以 possibly 措辞 + 备择解释在场 → 应放行（不过度阻塞）",
+  "input": {
+    "conclusion": "错误率上升与 v2.1.0 发布在时间上强相关，新版本可能是原因之一",
+    "type": "INFERENCE",
+    "claimed_strength": "possibly",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "time_correlation",
+        "detail": "发布后 30 分钟错误率由 0.2% 升至 1.7%（监控告警 #4412）",
+        "group": "monitor"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [
+      {
+        "detail": "同期服务端在扩容，负载变化亦可能产生影响",
+        "status": "explained",
+        "contradicts": false
+      }
+    ],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

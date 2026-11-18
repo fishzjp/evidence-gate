@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+
+# Evidence Gate runtime artifacts (may contain user conclusions — do not publish)
+.evidence-gate-log.jsonl
+*.evidence-gate-log.jsonl
+
+# Generated reports (regenerate with the commands in README)
+tests/TEST-REPORT.md
+benchmark/RESULTS-local.md
+
+# OS
+.DS_Store

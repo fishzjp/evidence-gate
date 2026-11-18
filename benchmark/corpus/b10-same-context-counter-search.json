@@ -1,0 +1,38 @@
+{
+  "id": "b10",
+  "name": "same-context-counter-search",
+  "expectation": "should_block",
+  "args": [],
+  "scenario": "反例（源自回归用例）：SGV 隔离反证（P0-2）：声称『已交叉验证』但反证搜寻在含原结论的同一上下文进行（同意偏差），L4 交叉验证声明不成立",
+  "input": {
+    "conclusion": "交付的推理 Docker 镜像不含预置答案文件",
+    "type": "FACT",
+    "claimed_strength": "cross_verified",
+    "risk_tier": "extreme",
+    "counter_search_context": "same",
+    "evidence": [
+      {
+        "kind": "source_code",
+        "detail": "审计 Dockerfile（tests/fixtures/infra/Dockerfile 本地副本）：无 COPY 答案文件",
+        "group": "source-audit",
+        "anchor": "tests/fixtures/infra/Dockerfile",
+        "quote": "FROM python:3.12-slim"
+      },
+      {
+        "kind": "data",
+        "detail": "逐层 diff 记录（tests/fixtures/docs/image-diff-2026-11-18.md）",
+        "group": "local-diff",
+        "anchor": "tests/fixtures/docs/image-diff-2026-11-18.md",
+        "quote": "仅新增一层：/app（应用代码）"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "全新环境 pull 镜像并运行任务样例，无泄漏迹象",
+      "env_independent": true,
+      "validates_target": true
+    },
+    "counter_evidence": [],
+    "generalization": null
+  }
+}

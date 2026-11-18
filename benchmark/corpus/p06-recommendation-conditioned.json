@@ -1,0 +1,39 @@
+{
+  "id": "p06",
+  "name": "recommendation-conditioned",
+  "expectation": "should_pass",
+  "args": [],
+  "scenario": "正例：RECOMMENDATION 给出依据与适用条件 → 应放行",
+  "input": {
+    "conclusion": "若 P95 需稳定低于 200ms，建议保留缓存层并为其增加预热任务",
+    "type": "RECOMMENDATION",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "data",
+        "detail": "上线后两周 P95 稳定在 178-181ms（本地副本 metrics 表）",
+        "anchor": "tests/fixtures/metrics/p95-2026-11.csv",
+        "quote": "after cache layer",
+        "content_supports": "supported",
+        "group": "metrics"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [
+      {
+        "detail": "缓存层带来一致性维护成本，需权衡",
+        "status": "explained",
+        "contradicts": false
+      }
+    ],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

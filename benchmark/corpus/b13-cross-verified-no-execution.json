@@ -1,0 +1,41 @@
+{
+  "id": "b13",
+  "name": "cross-verified-no-execution",
+  "expectation": "should_block",
+  "args": [],
+  "scenario": "反例：声称已交叉验证但从未实际执行（推理冒充验证）→ 应拦截",
+  "input": {
+    "conclusion": "该部署方案已在两个独立环境交叉验证有效",
+    "type": "INFERENCE",
+    "claimed_strength": "cross_verified",
+    "risk_tier": "high",
+    "evidence": [
+      {
+        "kind": "source_code",
+        "detail": "审阅 deploy.yaml 逻辑自洽（tests/fixtures/infra/Dockerfile 本地副本）",
+        "anchor": "tests/fixtures/infra/Dockerfile",
+        "quote": "FROM python:3.12-slim",
+        "content_supports": "supported",
+        "group": "review-1"
+      },
+      {
+        "kind": "official_doc",
+        "detail": "逐层 diff 记录无冲突（本地副本）",
+        "anchor": "tests/fixtures/docs/image-diff-2026-11-18.md",
+        "quote": "仅新增一层：/app（应用代码）",
+        "content_supports": "supported",
+        "group": "review-2"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

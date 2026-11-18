@@ -1,0 +1,33 @@
+{
+  "case": 14,
+  "name": "pre-action-gate",
+  "scenario": "不可逆动作前置闸门 G3（P0-4）：即将执行不可逆上线动作，仅有代码阅读证据、无实际验证 → 在 --gate-point pre-action 模式下必须 VERIFY_REQUIRED（普通模式下为 PASS_WITH_CAVEAT）",
+  "args": ["--gate-point", "pre-action"],
+  "input": {
+    "conclusion": "现在直接执行 kubectl apply 上线，服务不会中断",
+    "type": "INFERENCE",
+    "claimed_strength": "possibly",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "source_code",
+        "detail": "审阅部署定义（tests/fixtures/infra/Dockerfile 本地副本）：基础镜像不变、仅新增副本，无删除",
+        "group": "code-review",
+        "anchor": "tests/fixtures/infra/Dockerfile",
+        "quote": "FROM python:3.12-slim"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "generalization": null
+  },
+  "expected": {
+    "decision": "VERIFY_REQUIRED",
+    "reason_contains": ["irreversible"]
+  }
+}

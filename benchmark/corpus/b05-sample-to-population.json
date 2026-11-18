@@ -1,0 +1,34 @@
+{
+  "id": "b05",
+  "name": "sample-to-population",
+  "expectation": "should_block",
+  "args": [],
+  "scenario": "反例（源自回归用例）：小样本推断整体：100 条抽查通过 → 声称 100 万条 100% 全部合格（注意 claimed_strength 字段填低了，结论文本里的绝对化措辞必须被自动识别）",
+  "input": {
+    "conclusion": "抽检 100 条数据没有发现问题，所以 100 万条数据 100% 全部合格",
+    "type": "INFERENCE",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "sample",
+        "detail": "随机抽样 100 条人工检查（QA 记录表 tests/fixtures/qa/records-2026-11-17.csv）",
+        "group": "qa-sample",
+        "anchor": "tests/fixtures/qa/records-2026-11-17.csv",
+        "quote": "无重复、关键字段无空值"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "generalization": {
+      "sample_size": 100,
+      "population_size": 1000000,
+      "statistical_basis": false
+    }
+  }
+}

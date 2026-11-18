@@ -1,0 +1,30 @@
+{
+  "id": "p02",
+  "name": "experiment-verified",
+  "expectation": "should_pass",
+  "args": [],
+  "scenario": "正例：EXPERIMENT_RESULT 复现-修复-回归全链路真实执行 → 应放行",
+  "input": {
+    "conclusion": "订单重复扣费缺陷已在 staging 复现并验证修复（PR #512）",
+    "type": "EXPERIMENT_RESULT",
+    "claimed_strength": "verified",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "test_result",
+        "detail": "回归测试 test_double_charge.py：修复前在 main 失败（复现），应用 PR #512 后通过；全量 132/132（CI run #33120）",
+        "group": "ci"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "1) 未修复 main 上运行回归测试确认失败；2) 应用 PR #512 后本地与独立 CI 容器各跑一次全部通过",
+      "env_independent": true,
+      "validates_target": true
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

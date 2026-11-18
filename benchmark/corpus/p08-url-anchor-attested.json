@@ -1,0 +1,31 @@
+{
+  "id": "p08",
+  "name": "url-anchor-attested",
+  "expectation": "should_pass",
+  "args": [],
+  "scenario": "正例：离线下 URL 锚点 + content_supports 证明通道（attested 路径）→ 应放行",
+  "input": {
+    "conclusion": "上游网关在上周二出现过一次 cache=miss 慢查询告警",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "log",
+        "detail": "https://tickets.example.org/GW-2210 — 告警工单：/orders/list cache=miss 512ms",
+        "content_supports": "supported",
+        "group": "upstream-ticket"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

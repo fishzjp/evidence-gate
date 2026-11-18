@@ -1,0 +1,33 @@
+{
+  "id": "p10",
+  "name": "simple-fact-low-risk",
+  "expectation": "should_pass",
+  "args": [],
+  "scenario": "正例：低风险简单事实 + 锚点引文 → 应放行（简单事实简单检查）",
+  "input": {
+    "conclusion": "示例服务文档写明 server.listen() 返回 Promise",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "low",
+    "evidence": [
+      {
+        "kind": "official_doc",
+        "detail": "示例文档（本地副本）listen 一节",
+        "anchor": "tests/fixtures/fastify-server.md",
+        "quote": "server.listen() returns a Promise",
+        "content_supports": "supported",
+        "group": "docs"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

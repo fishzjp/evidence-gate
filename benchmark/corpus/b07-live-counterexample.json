@@ -1,0 +1,34 @@
+{
+  "id": "b07",
+  "name": "live-counterexample",
+  "expectation": "should_block",
+  "args": [],
+  "scenario": "反例（源自回归用例）：存在反例：基准数据本身显示 19/20 用例更快，但用例 #17 明确更慢，结论却声称『全部 20 个用例均优于』",
+  "input": {
+    "conclusion": "新正则库 re2-lite 在全部 20 个基准用例上性能均优于 JavaScript 内置 RegExp",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "high",
+    "evidence": [
+      {
+        "kind": "test_result",
+        "detail": "基准测试结果：20 个用例中 19 个 re2-lite 快 1.5–3 倍（bench/results-2026-11-16.json）",
+        "group": "bench"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "运行基准套件 bench/run.js --all，结果写入 results-2026-11-16.json",
+      "env_independent": true,
+      "validates_target": true
+    },
+    "counter_evidence": [
+      {
+        "detail": "同一份结果文件：用例 #17（长回溯模式）re2-lite 慢 40%，与『均优于』直接矛盾",
+        "status": "unaddressed",
+        "contradicts": true
+      }
+    ],
+    "generalization": null
+  }
+}

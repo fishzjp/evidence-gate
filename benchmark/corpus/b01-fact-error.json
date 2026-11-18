@@ -1,0 +1,33 @@
+{
+  "id": "b01",
+  "name": "fact-error",
+  "expectation": "should_block",
+  "args": [],
+  "scenario": "反例（源自回归用例）：事实错误：声称 API 官方支持某参数，但唯一依据是记忆，且官方文档直接矛盾",
+  "input": {
+    "conclusion": "该 API 官方支持 timeout 参数",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "memory",
+        "detail": "我记得这个 API 支持 timeout 参数，之前用过"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [
+      {
+        "detail": "官方 API 参考文档（https://api.example.com/docs#parameters）列出全部 6 个参数，其中没有 timeout",
+        "status": "unaddressed",
+        "contradicts": true
+      }
+    ],
+    "generalization": null
+  }
+}

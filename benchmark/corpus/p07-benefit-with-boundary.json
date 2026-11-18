@@ -1,0 +1,47 @@
+{
+  "id": "p07",
+  "name": "benefit-with-boundary",
+  "expectation": "should_pass",
+  "args": [],
+  "scenario": "正例：收益结论带边界条件反证（已解释）→ 应 PASS_WITH_CAVEAT 放行",
+  "input": {
+    "conclusion": "缓存层上线后 P95 从约 420ms 降至约 180ms（工作日高峰窗口对比）",
+    "type": "INFERENCE",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "data",
+        "detail": "metrics 周报（本地副本）：W44-45 基线 ~420ms，W46-47 ~180ms",
+        "anchor": "tests/fixtures/metrics/p95-2026-11.csv",
+        "quote": "after cache layer",
+        "content_supports": "supported",
+        "group": "metrics"
+      },
+      {
+        "kind": "log",
+        "detail": "慢查询日志（本地副本）：cache=hit 后 /orders/list 96ms",
+        "anchor": "tests/fixtures/logs/gateway-slow-query.log",
+        "quote": "slow query resolved cache=hit 96ms",
+        "content_supports": "supported",
+        "group": "logs"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [
+      {
+        "detail": "2026-W46 流量比 W44 低约 30%，低负载亦可能压低 P95",
+        "status": "explained",
+        "contradicts": false
+      }
+    ],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

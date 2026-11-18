@@ -1,0 +1,31 @@
+{
+  "case": 11,
+  "name": "abstain",
+  "scenario": "ABSTAIN（P0-3）：结论所需证据不可得（无生产环境查询权限），应拒答而非降级输出或假装可验证",
+  "input": {
+    "conclusion": "生产环境当前生效的 feature-flag payments_v2 是开启状态",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence_obtainable": "no",
+    "evidence": [
+      {
+        "kind": "memory",
+        "detail": "上周听值班同事说这个 flag 已经开了"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "generalization": null
+  },
+  "expected": {
+    "decision": "ABSTAIN",
+    "evidence_level": "L1",
+    "reason_contains": ["obtain"]
+  }
+}

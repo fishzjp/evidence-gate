@@ -1,0 +1,39 @@
+{
+  "id": "p01",
+  "name": "fact-anchored",
+  "scenario": "正例：FACT 带本地文档锚点+引文机械核验通过，反证已核实排除 → 应放行",
+  "expectation": "should_pass",
+  "args": [],
+  "input": {
+    "conclusion": "foo-lib 的默认请求超时是 60 秒",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "official_doc",
+        "detail": "foo-lib 配置参考（本地副本）：timeout 默认 60 秒",
+        "anchor": "tests/fixtures/docs/api-timeout.md",
+        "quote": "default timeout is 60 seconds",
+        "content_supports": "supported",
+        "group": "docs"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [
+      {
+        "detail": "旧版本 v1.x 默认 30 秒；已核对锁文件确认项目固定 v2.3.1，v1.x 行为不适用",
+        "status": "refuted",
+        "contradicts": true
+      }
+    ],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

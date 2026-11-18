@@ -1,0 +1,41 @@
+{
+  "id": "p03",
+  "name": "cross-verified-isolated",
+  "expectation": "should_pass",
+  "args": [],
+  "scenario": "正例：cross_verified 双独立组 + 隔离反证 + 有效执行 → 应放行 L4",
+  "input": {
+    "conclusion": "交付的推理镜像相对官方 python:3.12-slim 仅新增应用层，未携带其他文件层",
+    "type": "FACT",
+    "claimed_strength": "cross_verified",
+    "risk_tier": "extreme",
+    "evidence": [
+      {
+        "kind": "source_code",
+        "detail": "审计 Dockerfile（本地副本）：仅 FROM 基础镜像 + COPY 应用",
+        "anchor": "tests/fixtures/infra/Dockerfile",
+        "quote": "FROM python:3.12-slim",
+        "content_supports": "supported",
+        "group": "source-audit"
+      },
+      {
+        "kind": "data",
+        "detail": "逐层 diff 记录（本地副本）：仅新增 /app 一层",
+        "anchor": "tests/fixtures/docs/image-diff-2026-11-18.md",
+        "quote": "仅新增一层：/app（应用代码）",
+        "content_supports": "supported",
+        "group": "local-diff"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "全新环境 pull 镜像并运行任务样例，无泄漏迹象",
+      "env_independent": true,
+      "validates_target": true
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

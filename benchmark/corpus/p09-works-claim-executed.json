@@ -1,0 +1,36 @@
+{
+  "id": "p09",
+  "name": "works-claim-executed",
+  "expectation": "should_pass",
+  "args": [],
+  "scenario": "正例：可以正常运行声明 + 有效执行验证 → 应放行 L3",
+  "input": {
+    "conclusion": "订单服务在 v2.3.1 上可以正常运行（回归全绿）",
+    "type": "EXPERIMENT_RESULT",
+    "claimed_strength": "verified",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "test_result",
+        "detail": "全量回归 132/132 通过（CI run #33120）",
+        "group": "ci"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "本地与独立 CI 容器各跑一次全量回归",
+      "env_independent": true,
+      "validates_target": true
+    },
+    "counter_evidence": [
+      {
+        "detail": "#33118 曾有一例失败，重跑确认为环境抖动（网络注入超时），与代码无关",
+        "status": "refuted",
+        "contradicts": false
+      }
+    ],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

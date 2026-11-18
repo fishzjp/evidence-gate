@@ -1,0 +1,31 @@
+{
+  "id": "b03",
+  "name": "causal-jump",
+  "expectation": "should_block",
+  "args": [],
+  "scenario": "反例（源自回归用例）：因果推理跳跃：A（发版）之后 B（错误率上升）发生，无因果证据就想断言 A 导致 B",
+  "input": {
+    "conclusion": "客户端 v2.1.0 上线后错误率上升，说明 v2.1.0 导致了错误率上升",
+    "type": "INFERENCE",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "time_correlation",
+        "detail": "错误率监控（grafana /d/err）：v2.1.0 发布（14:00）后 5 分钟错误率从 0.1% 升至 2%"
+      },
+      {
+        "kind": "memory",
+        "detail": "发布窗口内应该没有其他变更（听值班同学说的）"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "generalization": null
+  }
+}

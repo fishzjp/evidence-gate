@@ -1,0 +1,28 @@
+{
+  "id": "b06",
+  "name": "theory-not-verified",
+  "expectation": "should_block",
+  "args": [],
+  "scenario": "反例（源自回归用例）：理论可行 ≠ 实际验证：只读了代码就断言重构方案可以正常运行",
+  "input": {
+    "conclusion": "这个重构方案可以正常运行，不会破坏现有功能",
+    "type": "INFERENCE",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "source_code",
+        "detail": "逐行审阅重构 diff（PR #77，src/ 目录 12 个文件）：接口签名兼容、调用点全部更新",
+        "group": "code-review"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "generalization": null
+  }
+}

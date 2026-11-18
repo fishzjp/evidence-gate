@@ -1,0 +1,52 @@
+{
+  "case": 10,
+  "name": "cross-validation",
+  "scenario": "多来源交叉验证：源码审计、独立扫描工具、本地逐层 diff 三条独立证据线 + 实际运行，支持最高可信度结论",
+  "input": {
+    "conclusion": "交付给客户的推理 Docker 镜像是干净的（无预置答案、无后门文件）",
+    "type": "FACT",
+    "claimed_strength": "cross_verified",
+    "risk_tier": "extreme",
+    "counter_search_context": "isolated",
+    "evidence": [
+      {
+        "kind": "source_code",
+        "detail": "审计 Dockerfile（tests/fixtures/infra/Dockerfile 本地副本）：无 COPY 答案文件、无 curl 外部资源",
+        "group": "source-audit",
+        "anchor": "tests/fixtures/infra/Dockerfile",
+        "quote": "FROM python:3.12-slim"
+      },
+      {
+        "kind": "test_result",
+        "detail": "独立扫描工具 trivy 在 CI 中扫描最终镜像：0 个高危项、无异常文件层（CI job scan #771，已人工核对扫描日志）",
+        "group": "trivy-scan",
+        "content_supports": "supported"
+      },
+      {
+        "kind": "data",
+        "detail": "本地全新 pull 镜像逐层 diff（记录 tests/fixtures/docs/image-diff-2026-11-18.md）",
+        "group": "local-diff",
+        "anchor": "tests/fixtures/docs/image-diff-2026-11-18.md",
+        "quote": "仅新增一层：/app（应用代码）"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "在全新隔离环境 pull 镜像并运行 3 个任务样例：输出正常且无答案泄漏迹象",
+      "env_independent": true,
+      "validates_target": true
+    },
+    "counter_evidence": [
+      {
+        "detail": "基础镜像 2026-09 曾报供应链事件 CVE-2026-1234",
+        "status": "refuted",
+        "contradicts": false
+      }
+    ],
+    "generalization": null
+  },
+  "expected": {
+    "decision": "PASS",
+    "evidence_level": "L4"
+  }
+}

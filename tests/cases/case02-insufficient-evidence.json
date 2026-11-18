@@ -1,0 +1,30 @@
+{
+  "case": 2,
+  "name": "insufficient-evidence",
+  "scenario": "证据不足：仅有一个时间相关性间接现象，却想下因果判断",
+  "input": {
+    "conclusion": "线上服务内存持续上涨是由 cache 模块 v2.3 的改动引起的",
+    "type": "INFERENCE",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "time_correlation",
+        "detail": "监控（grafana /d/mem）显示 cache v2.3 上线 30 分钟后内存曲线开始持续上升"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "generalization": null
+  },
+  "expected": {
+    "decision": "VERIFY_REQUIRED",
+    "evidence_level": "L1",
+    "reason_contains": ["causal"]
+  }
+}

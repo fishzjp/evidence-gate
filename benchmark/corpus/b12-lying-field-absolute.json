@@ -1,0 +1,37 @@
+{
+  "id": "b12",
+  "name": "lying-field-absolute",
+  "expectation": "should_block",
+  "args": [],
+  "scenario": "反例：claimed_strength 填 judged 但结论文本含 100%/全部（措辞作弊）→ 应拦截",
+  "input": {
+    "conclusion": "100 万条数据 100% 全部合格，可以直接交付",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "sample",
+        "detail": "抽查 100 条无重复、字段完整（记录表 tests/fixtures/qa/records-2026-11-17.csv）",
+        "anchor": "tests/fixtures/qa/records-2026-11-17.csv",
+        "quote": "随机抽样 100 条：无重复、关键字段无空值",
+        "content_supports": "supported",
+        "group": "qa-sample"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": {
+      "sample_size": 100,
+      "population_size": 1000000,
+      "statistical_basis": false
+    }
+  }
+}

@@ -1,0 +1,2 @@
+2026-11-14T02:11:03Z WARN slow query cache=miss 512ms /orders/list
+2026-11-21T02:09:44Z INFO slow query resolved cache=hit 96ms /orders/list

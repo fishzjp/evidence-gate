@@ -1,0 +1,29 @@
+{
+  "id": "p05",
+  "name": "hypothesis-labeled",
+  "expectation": "should_pass",
+  "args": [],
+  "scenario": "正例：HYPOTHESIS 如实标注为假设 → 应放行",
+  "input": {
+    "conclusion": "冷启动延迟可能由容器镜像层未预热引起（待实验证实）",
+    "type": "HYPOTHESIS",
+    "claimed_strength": "hypothesis",
+    "risk_tier": "low",
+    "evidence": [
+      {
+        "kind": "observation",
+        "detail": "三次冷启动均 >2s，热启动 <200ms"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

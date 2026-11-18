@@ -1,0 +1,33 @@
+{
+  "case": 12,
+  "name": "anchor-quote-mismatch",
+  "scenario": "锚点三段式核查（P0-1）：锚点可解析，但声称的引文在实际内容中不存在（引用存在≠引用支持）→ 直接证据降级",
+  "input": {
+    "conclusion": "foo-lib 的默认超时是 30 秒，官方文档明确写明",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "official_doc",
+        "detail": "foo-lib 配置参考（本地副本 tests/fixtures/docs/api-timeout.md），文档写明 default timeout is 30 seconds",
+        "group": "foo-docs",
+        "anchor": "tests/fixtures/docs/api-timeout.md",
+        "quote": "default timeout is 30 seconds"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "generalization": null
+  },
+  "expected": {
+    "decision": "VERIFY_REQUIRED",
+    "evidence_level": "L1",
+    "reason_contains": ["anchor"]
+  }
+}

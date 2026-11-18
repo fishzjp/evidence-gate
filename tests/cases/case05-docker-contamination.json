@@ -1,0 +1,37 @@
+{
+  "case": 5,
+  "name": "docker-contamination",
+  "scenario": "验证环境污染：golden patch 在构建镜像前已合入，测试通过但测的不是 agent 的修复",
+  "input": {
+    "conclusion": "47 个测试全部通过，agent 的 bug 修复已被验证成功",
+    "type": "EXPERIMENT_RESULT",
+    "claimed_strength": "verified",
+    "risk_tier": "high",
+    "evidence": [
+      {
+        "kind": "test_result",
+        "detail": "eval Docker 镜像内全量测试 47/47 通过（CI run #8842 日志）",
+        "group": "eval-run"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "在 eval 镜像内运行 npm test，47 passed",
+      "env_independent": false,
+      "validates_target": true
+    },
+    "counter_evidence": [
+      {
+        "detail": "golden patch（官方参考修复）在镜像构建前已合入 main 分支，镜像内跑的代码可能不是 agent 的修复版本",
+        "status": "unaddressed",
+        "contradicts": true
+      }
+    ],
+    "generalization": null
+  },
+  "expected": {
+    "decision": "REJECT",
+    "evidence_level": "L2",
+    "reason_contains": ["environment"]
+  }
+}
