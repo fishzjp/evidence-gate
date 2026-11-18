@@ -31,7 +31,7 @@
 
 ### 工程属性
 
-- `scripts/gate_check.py`：Python ≥3.8，仅标准库，零依赖，确定性输出
+- `scripts/gate_check.py`：Python 3.10+，仅标准库，零依赖，确定性输出
 - 测试：14 个回归用例 + 3 个 CLI 子测试（tests/run_tests.py）
 - CI：单元测试 / benchmark 门禁（FAR/FRR=0）/ secret 扫描 / skill 校验
 
