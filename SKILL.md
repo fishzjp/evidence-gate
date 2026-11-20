@@ -77,7 +77,7 @@ as much a gate failure as letting an overclaim through.
                claim, the check is three-stage: (a) anchor resolves, (b) you
                actually read the content, (c) a quoted line from it supports
                the claim. "The citation exists" ≠ "the citation supports it" —
-               half of real citations don't (see docs/research-survey.md). For
+               about half of real citations don't. For
                local files give anchor + quote; the script verifies the
                quote mechanically AND that quoted figures match the figures
                the conclusion claims (MISLEADING_QUOTE). Date every source
@@ -397,7 +397,7 @@ These pass casual review; the gate is built to catch them
 
 The v3 upgrade adds five classes that defeated the v2 gate in A/B testing
 (all six adversarial attacks passed v2 at 100%; v3 blocks all with zero
-false rejects — `benchmark/AB-RESULTS.md`):
+false rejects; reproducible via `benchmark/run_ab.py`):
 
 7. **Misleading quote** — the quote is real, the anchor is real, but the
    numbers disagree: conclusion says 30s, quote says 60s. Existence of the
@@ -468,12 +468,6 @@ list is empty because you didn't look.
   external/formal) and claim-class routing.
 - `examples/` — worked examples with real gate inputs and outputs, every
   decision class, including the v3 mechanisms.
-- `docs/research-survey.md` + `docs/research-survey-2.md` — the 2024–2026
-  research this design was rebuilt against, with verified citations; the
-  second round covers correlation, heterogeneity, temporal validity,
-  abstention and calibration, and corrects two errors in the first.
-- `benchmark/AB-RESULTS.md` — the 1.0-vs-2.0 A/B: adversarial FAR 100% → 0%
-  at FRR 0, core suite unchanged (full backward compatibility).
 - `tests/` (project root, if present) — 26 runnable regression cases
   (incl. paraphrase-invariance: semantically equivalent rewrites must not
   flip decisions): `python3 tests/run_tests.py --report`.

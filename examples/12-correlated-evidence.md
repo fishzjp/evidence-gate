@@ -80,4 +80,4 @@ Verifier: {"id": "unspecified", "protocol": "gate_check/3.0.0", "entailment_chan
 
 ## 为什么
 
-三条 finding 各自拦掉一层：CORRELATED_EVIDENCE 把 3 条线塌缩成 2 条（同注册域 = 通稿转载风险；两个 URL 同宿主，"独立报道"的独立性是数 URL 数出来的幻觉）；ATTESTED_ONLY_LINES 封顶 L3 —— 塌缩后的线没有任何一条被机械核实（引文未查、URL 未抓、无工具线），"存在证据"≠"证据被检验"；CROSS_FAMILY_MISSING 指出连异构验证也不存在。塌缩判据是语法性的：同声明组 / 同注册域（可双方证明 same_host_independent 覆盖）/ 引文 token Jaccard≥0.7 / 引用链（引文或 detail 里出现对方的 URL）。语义级改写转载（同一通稿的不同措辞版本）目前检测不了 —— Open Problem，见 docs/research-survey-2.md §5。
+三条 finding 各自拦掉一层：CORRELATED_EVIDENCE 把 3 条线塌缩成 2 条（同注册域 = 通稿转载风险；两个 URL 同宿主，"独立报道"的独立性是数 URL 数出来的幻觉）；ATTESTED_ONLY_LINES 封顶 L3 —— 塌缩后的线没有任何一条被机械核实（引文未查、URL 未抓、无工具线），"存在证据"≠"证据被检验"；CROSS_FAMILY_MISSING 指出连异构验证也不存在。塌缩判据是语法性的：同声明组 / 同注册域（可双方证明 same_host_independent 覆盖）/ 引文 token Jaccard≥0.7 / 引用链（引文或 detail 里出现对方的 URL）。语义级改写转载（同一通稿的不同措辞版本）目前检测不了 —— Open Problem。

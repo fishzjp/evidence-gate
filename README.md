@@ -27,7 +27,7 @@ v3.0.0（"Evidence Gate 2.0"）是一次可靠性专项升级：不是把门槛�
 （2024 年的快照撑不起"当前版本"）、**证据里的数字和结论里的是否同一个**
 （引文真实存在 ≠ 引文支持结论）。A/B 实测：6 类针对性攻击在 v2 上全部
 穿透（FAR 100%），v3 全部拦截且诚实正例零误伤，旧语料完全向后兼容
-（[benchmark/AB-RESULTS.md](benchmark/AB-RESULTS.md)）。
+（`python3 benchmark/run_ab.py` 可复现）。
 
 > Evidence Gate 是验证与质量控制机制，不是正确性证明器。它能降低
 > "未经验证的错误结论流入最终输出"的风险，但不能保证结论一定正确。
@@ -93,8 +93,7 @@ v3 又补上五类更隐蔽的（v2 全部放行、v3 全部拦截，均有 A/B 
 | 通道错配冒充验证 | 读代码推理后宣布"已验证" | 机器可判的声明必须走机器通道 |
 
 这不是态度问题，而是机制问题。2024–2026 年的研究反复验证了几个结论
-（引用均已逐条核实，详见 [docs/research-survey.md](docs/research-survey.md)
-与 [docs/research-survey-2.md](docs/research-survey-2.md)）：
+（设计时逐条核实原始论文，并允许证据推翻既有设计）：
 
 - **自我验证靠不住。** 让模型检查自己的答案，在没有外部反馈的情况下几乎
   不会产生增益（Huang et al., ICLR 2024）。
@@ -171,8 +170,7 @@ Agent 侧                    脚本侧（确定性）
 
 ### 进阶机制
 
-v2 的四个机制之上，v3 新增五个（每条都有正例防误伤，A/B 见
-[benchmark/AB-RESULTS.md](benchmark/AB-RESULTS.md)）：
+v2 的四个机制之上，v3 新增五个（每条都有防误伤正例）：
 
 - **锚点三段式核查。** 一条引用要过三关：锚点可以解析、内容被实际读过、
   引文确实出现在文中（本地文件由脚本机械比对）。只过第一关的"引用存在"
@@ -207,8 +205,27 @@ v2 的四个机制之上，v3 新增五个（每条都有正例防误伤，A/B �
 运行只依赖 Python 3.10+，全部使用标准库，零第三方依赖。CI 在 3.10–3.13
 矩阵上验证。
 
-**作为 Agent Skill 安装。** 本仓库本身就是一个 skill，[SKILL.md](SKILL.md)
-位于仓库根目录。把它克隆或复制到你的 Agent 运行时技能目录即可：
+**方式一：skills CLI 一键安装（推荐）。** 本仓库已收录进开放 Agent skills
+生态，一条命令即可安装到 Claude Code、Cursor、Codex、GitHub Copilot 等
+35 个 Agent 运行时（19 个通用路径 + 16 个符号链接适配，以实际安装输出
+为准）：
+
+```bash
+npx skills add fishzjp/evidence-gate
+```
+
+安装后可用 `npx skills update` 统一升级，`npx skills check` 检查更新。
+
+**方式二：Claude Code 插件安装。** 仓库自带 plugin marketplace 清单
+（`.claude-plugin/`），在 Claude Code 会话里执行：
+
+```text
+/plugin marketplace add fishzjp/evidence-gate
+/plugin install evidence-gate@evidence-gate
+```
+
+**方式三：手动克隆。** 本仓库本身就是一个 skill，[SKILL.md](SKILL.md)
+位于仓库根目录，克隆或复制到你的 Agent 运行时技能目录即可：
 
 ```bash
 # 通用路径示例：
@@ -344,7 +361,7 @@ python3 tests/validate_skill.py         # SKILL.md 结构与引用完整性
 用 `python3 benchmark/run_benchmark.py` 即可复现。这个命令同时也是 CI
 门禁：只要 FAR 或 FRR 不为零，就退出非零。
 
-**v2 vs v3 A/B（同一输入喂两版，[benchmark/AB-RESULTS.md](benchmark/AB-RESULTS.md)）：**
+**v2 vs v3 A/B（同一输入喂两版，`python3 benchmark/run_ab.py` 可复现）：**
 
 | 套件 | Gate | Accuracy | FAR | FRR |
 |------|------|----------|-----|-----|
@@ -362,9 +379,9 @@ v3 字段（`verified_by: "tool:..."` 及 detail 点名工具），使其诚实�
 需要说明的局限：语料由维护者构造，存在构造者
 偏差；并且它测的是闸门判定器本身，而不是端到端的 Agent 表现。
 
-**未测量：Agent 级对比。** baseline agent 与 agent+gate 的端到端对比协议
-已经写好（[benchmark/AGENT-PROTOCOL.md](benchmark/AGENT-PROTOCOL.md)），
-但尚未实际运行。因此在端到端效果上，本项目不宣称"提高 Agent 准确率"
+**未测量：Agent 级对比。** baseline agent 与 agent+gate 的端到端对比
+（Accuracy / Hallucination Rate / FAR / FRR / Cost / Latency）协议已定义、
+尚未实际运行。因此在端到端效果上，本项目不宣称"提高 Agent 准确率"
 这样的结论；它目前能主张的只有设计目标——降低未经验证的错误结论流入
 最终输出的风险。
 
@@ -394,8 +411,7 @@ v3 字段（`verified_by: "tool:..."` 及 detail 点名工具），使其诚实�
    刻度），不是校准过的正确概率——v3 因此移除了启发式 confidence 字段。
    校准回路是被动闭环，依赖事后回标的 outcome 数据，冷启动阶段不构成
    约束。语义级转载检测（同一通稿的非逐字改写）、无真值场景下蕴含判断
-   ~71% 的准确率上限等开放问题见
-   [docs/research-survey-2.md](docs/research-survey-2.md) §5。
+   ~71% 的准确率上限等，仍是本项目的开放问题。
 
 除以上八条，还有一个结构性边界：**自报字段可以造假**。`content_supports`
 和 `counter_search_context` 这类字段由填写者声明，脚本无法核实其真伪；
@@ -439,10 +455,7 @@ v3 字段（`verified_by: "tool:..."` 及 detail 点名工具），使其诚实�
 ## 架构与仓库结构
 
 完整的判定管线，以及每个模块的输入、输出、职责和失败情况，写在
-[ARCHITECTURE.md](ARCHITECTURE.md) 里。设计所依据的两轮文献调研（引用
-逐条核实）在 [docs/research-survey.md](docs/research-survey.md) 与
-[docs/research-survey-2.md](docs/research-survey-2.md)；本次升级的完整
-报告（十节结构）在 [docs/final-report-v3.md](docs/final-report-v3.md)。
+[ARCHITECTURE.md](ARCHITECTURE.md) 里。
 
 ```
 evidence-gate/
@@ -450,10 +463,10 @@ evidence-gate/
 ├── scripts/gate_check.py # 确定性判定器（零依赖 Python）
 ├── references/           # 等级定义 / 判定矩阵 / 失效模式 / 风险分级
 ├── examples/             # 十四个带真实输出的示例
-├── benchmark/            # 真值语料（core+adversarial）+ 运行器 + A/B + Agent 级协议
+├── benchmark/            # 真值语料（core+adversarial）+ 运行器 + A/B 对照
 │   └── legacy/           # v2.0.0 判定器快照（A/B 基线）
 ├── tests/                # 回归用例（含改写不变性）+ CLI 子测试 + skill 校验
-└── docs/                 # 两轮文献调研 + 最终报告
+└── .claude-plugin/       # Claude Code 插件清单（marketplace + plugin manifest）
 ```
 
 ## 参与贡献

@@ -25,8 +25,8 @@ Core metrics:
 
 This is a GATE-level benchmark: it measures the deterministic checker on
 inputs with known ground truth. It does NOT measure end-to-end agent
-accuracy (that requires the agent-level protocol in AGENT-PROTOCOL.md,
-not yet run — see docs for what is and is not measured).
+accuracy (that requires an agent-level protocol — defined but not yet
+run; see docs for what is and is not measured).
 
 All entries run with --offline so URL anchors take the attestation path;
 results are deterministic and network-independent.
@@ -172,13 +172,14 @@ def main() -> int:
         "",
         "- 本基准只测**闸门本身**（确定性判定器 + 输入真值），不测 Agent 端到端准确率。",
         "- Agent-level 基准（baseline agent vs agent+gate 的 Accuracy / Hallucination "
-        "Rate / Cost 等）协议见 `benchmark/AGENT-PROTOCOL.md`，**尚未运行**，"
+        "Rate / Cost 等）协议已定义、**尚未运行**，"
         "因此本项目不宣称任何端到端准确率提升。",
         "- FAR/FRR 仅对本语料成立；语料由维护者构造，存在构造者偏差，"
         "欢迎社区扩充语料（见 CONTRIBUTING.md）。",
         "- adversarial suite 的预期（should_block/should_pass）按 v3 认识论标准"
         "构造（异构验证、独立性、时效），与 core suite 的 v2 标准在'何谓充分"
-        "证据'上存在哲学差异——这正是升级本身；1.0 vs 2.0 的对照见 AB-RESULTS.md。",
+        "证据'上存在哲学差异——这正是升级本身；1.0 vs 2.0 的对照可用 "
+        "`python3 benchmark/run_ab.py` 复现。",
         "",
     ]
     report = "\n".join(lines) + "\n"

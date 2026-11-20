@@ -121,7 +121,7 @@ Final Answer
   attested 的多线封顶 L3
 - **失败情况**：同源判据是语法性的（宿主/Jaccard/引用链），语义级改写
   转载（同一通稿的不同措辞版本）可能漏塌缩（Open Problem：非字面
-  syndication 检测，见 docs/research-survey-2.md §5）
+  syndication 检测）
 
 ### 7. 所需等级（脚本）
 

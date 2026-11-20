@@ -64,4 +64,4 @@ Verifier: {"id": "unspecified", "protocol": "gate_check/3.0.0", "entailment_chan
 
 ## 为什么
 
-ABSTAIN 与降级不同：降级是“证据弱但有，用弱措辞”；ABSTAIN 是“决定性证据不存在且拿不到，任何措辞都不该输出”。带保留的猜测（“应该是开的”）会诱导读者以为这个问题本可以回答。研究显示 agent 在不该答的问题上硬答比例很高（见 docs/research-survey.md），ABSTAIN 就是为此设计的第五类决策。v3 起可附 `unobtainable_reason`（no_access / nonexistent / unreproducible / undecidable）说明缺口类型，随输出与审计日志落档（tests case26 演示，输出里有 `Unobtainable:` 行）。
+ABSTAIN 与降级不同：降级是“证据弱但有，用弱措辞”；ABSTAIN 是“决定性证据不存在且拿不到，任何措辞都不该输出”。带保留的猜测（“应该是开的”）会诱导读者以为这个问题本可以回答。研究显示 agent 在不该答的问题上硬答比例很高，ABSTAIN 就是为此设计的第五类决策。v3 起可附 `unobtainable_reason`（no_access / nonexistent / unreproducible / undecidable）说明缺口类型，随输出与审计日志落档（tests case26 演示，输出里有 `Unobtainable:` 行）。

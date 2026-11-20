@@ -66,4 +66,4 @@ Verifier: {"id": "unspecified", "protocol": "gate_check/3.0.0", "entailment_chan
 
 ## 为什么
 
-这是 v2 的核心机制（锚点三段式第三段）：脚本打开文件比对引文，“default timeout is 30 seconds” 不在文件中 → ANCHOR_QUOTE_MISSING → 证据降级 direct→indirect → L1 < L2 → VERIFY_REQUIRED。实测约半数真实引用并不支持其结论（见 docs/research-survey.md），引用存在只完成了三段中的第一段。
+这是 v2 的核心机制（锚点三段式第三段）：脚本打开文件比对引文，“default timeout is 30 seconds” 不在文件中 → ANCHOR_QUOTE_MISSING → 证据降级 direct→indirect → L1 < L2 → VERIFY_REQUIRED。实测约半数真实引用并不支持其结论，引用存在只完成了三段中的第一段。

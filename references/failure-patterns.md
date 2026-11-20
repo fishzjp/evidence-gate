@@ -77,7 +77,7 @@ file — and the source exists, but its content doesn't actually support the
 claim attached to it. Field research on agent citations found roughly half
 of real citations don't support their claim (Stanford 2024: 51.5% of
 internet citations misused; SourceCheckup 2025: 50–90% irrelevant or
-only-partially-supporting medical citations; see `docs/research-survey.md`).
+only-partially-supporting medical citations).
 Existence is easy to check; *support* is what nobody checks.
 
 **Detection:** the three-stage anchor check — (1) anchor resolves, (2)

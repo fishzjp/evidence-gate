@@ -1,0 +1,13 @@
+{
+  "name": "evidence-gate",
+  "version": "3.0.0",
+  "description": "Deterministic conclusion-quality gate for AI agents: evidence levels, counter-evidence checks, and wording ceilings enforced before a conclusion ships.",
+  "author": {
+    "name": "fishzjp",
+    "url": "https://github.com/fishzjp"
+  },
+  "homepage": "https://github.com/fishzjp/evidence-gate",
+  "repository": "https://github.com/fishzjp/evidence-gate",
+  "license": "MIT",
+  "keywords": ["verification", "evidence", "reliability", "fact-checking", "agents"]
+}

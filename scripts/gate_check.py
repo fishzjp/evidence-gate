@@ -6,8 +6,7 @@ conclusion may be output, at what strength, and with what caveats.
 
 Core rule: CONCLUSION STRENGTH MUST NOT EXCEED EVIDENCE STRENGTH.
 
-v3 upgrades (research-driven, see docs/research-survey-2.md; "EG 2.0" in
-the reliability report):
+v3 upgrades (research-driven; "EG 2.0" in the reliability report):
 
   P0-A MISLEADING_QUOTE — a quoted line that exists in the anchor but
        states DIFFERENT figures than the conclusion claims is caught by a

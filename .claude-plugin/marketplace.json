@@ -1,0 +1,17 @@
+{
+  "name": "evidence-gate",
+  "owner": {
+    "name": "fishzjp",
+    "url": "https://github.com/fishzjp"
+  },
+  "plugins": [
+    {
+      "name": "evidence-gate",
+      "source": "./",
+      "description": "Deterministic conclusion-quality gate for AI agents: evidence levels, counter-evidence checks, and wording ceilings enforced before a conclusion ships.",
+      "version": "3.0.0",
+      "category": "quality",
+      "keywords": ["verification", "evidence", "reliability", "fact-checking"]
+    }
+  ]
+}

@@ -22,8 +22,8 @@
 | 14 | [14-pass-with-caveat.md](14-pass-with-caveat.md) | 带强制保留的放行 | 结论成立，但解释过的反证必须随结论输出 | PASS_WITH_CAVEAT |
 
 覆盖全部五类决策：PASS / PASS_WITH_CAVEAT（示例 14 专门演示）/ VERIFY_REQUIRED /
-ABSTAIN / REJECT。示例 11–13 演示 v3 新增的对抗类与反误伤正例（A/B 对照见
-`benchmark/AB-RESULTS.md`：v2 在 6 类攻击上 FAR 100%，v3 全拦截且正例零误伤）。
+ABSTAIN / REJECT。示例 11–13 演示 v3 新增的对抗类与反误伤正例（A/B 对照可用
+`python3 benchmark/run_ab.py` 复现：v2 在 6 类攻击上 FAR 100%，v3 全拦截且正例零误伤）。
 
 ## 亲手复现
 

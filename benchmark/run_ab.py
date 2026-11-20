@@ -147,7 +147,7 @@ def main() -> int:
         "## 解读注意（诚实边界）",
         "",
         "- adversarial suite 的 6 条攻击按 v3 认识论构造，v1 在其上 FAR=100%",
-        "  是升级目标（见 docs/research-survey-2.md §3 矩阵），不是对 v1 的",
+        "  是升级目标（v3 的设计矩阵），不是对 v1 的",
         "  不公平标签：core suite 全部保留 v2 时代的原始标签。",
         "- 披露一处 core 输入适配：p03 增加了可选 v3 字段",
         "  （evidence[].verified_by=\"tool:...\" 及 detail 中点名工具），",

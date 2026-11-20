@@ -83,7 +83,7 @@ current either.
 
 **Why the anchor content check exists:** field research on agent citations
 found roughly half of real, resolvable citations do not actually support the
-claim they're attached to (see `docs/research-survey.md`). An anchor proves the
+claim they're attached to. An anchor proves the
 source exists; only reading it proves it helps you. A direct item whose
 content was never opened (no quote, no attestation) counts as unresolved for
 strong claims.
