@@ -1,0 +1,34 @@
+{
+  "case": 25,
+  "name": "mechanical-channel-pass",
+  "scenario": "P0-F 反误伤（v3）：同样是 code_behavior 类声明，验证走 test 通道（真实执行测试）——通道配对正确时 CHANNEL_MISMATCH 不触发，verified 正常放行。与 case24 对照：同一声明类别，验证通道决定结局",
+  "input": {
+    "conclusion": "解析器对空输入返回空列表：new_parse() 已通过目标测试验证",
+    "type": "EXPERIMENT_RESULT",
+    "claimed_strength": "verified",
+    "risk_tier": "medium",
+    "claim_class": "code_behavior",
+    "evidence": [
+      {
+        "kind": "test_result",
+        "detail": "tests/test_parser.py::test_empty_input 先复现旧 bug（失败）再验证修复（通过）",
+        "group": "regression-test"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "python -m pytest tests/test_parser.py::test_empty_input -v 通过（修复前失败）",
+      "env_independent": true,
+      "validates_target": true,
+      "channel": "test"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  },
+  "expected": {
+    "decision": "PASS",
+    "evidence_level": "L3"
+  }
+}

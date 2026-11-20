@@ -43,22 +43,28 @@
 
 ```text
 Evidence Gate Result
+
 Conclusion:
+100 万条数据 100% 全部合格，可以直接交付
 Type: FACT
 Claimed strength: absolute  (risk: high)
-Evidence Level: L2  (claim requires L4)
+Evidence Level: L2  (claim requires L4; independent lines: 1)
 Evidence (anchor three-stage check):
   - [direct·mech✓] sample — quote verified in anchor: tests/fixtures/qa/records-2026-11-17.csv
-  execution: executed=False valid=False env_independent=unknown validates_target=unknown
+  execution: executed=False valid=False env_independent=unknown validates_target=unknown channel=None
 Counter-evidence search context: isolated
 Findings:
-Confidence: LOW
+  [high] ABSOLUTE_WORDING: absolute wording detected in conclusion; claimed_strength escalated 'judged' -> 'absolute'
+  [high] SAMPLE_TO_POPULATION: generalizing a sample of 100 to a population of 1,000,000 without statistical basis: the sample cannot certify the whole
+  [reject] ABSOLUTE_OVERREACH: absolute claim requires cross-validated evidence (L4); current evidence is L2. No amount of confidence justifies absolute wording — restate at allowed strength with explicit scope
 Decision: REJECT  (exit 20)
 Reason:
+  absolute claim requires cross-validated evidence (L4); current evidence is L2. No amount of confidence justifies absolute wording — restate at allowed strength with explicit scope; absolute wording detected in conclusion; claimed_strength escalated 'judged' -> 'absolute'; generalizing a sample of 100 to a population of 1,000,000 without statistical basis: the sample cannot certify the whole
 Allowed wording: 根据现有证据可以判断 (judged from evidence)
+Calibration: levels are ordinal, not probabilities; empirical per-level accuracy via --calibration
 Required actions:
   - scan the full population, or use a statistically valid sampling plan, or restate scoped to the sample (“100 sampled, no issues found; whole not verified”)
-Verifier: {"id": "unspecified", "protocol": "gate_check/2.0.0", "entailment_channel": "mechanical"}
+Verifier: {"id": "unspecified", "protocol": "gate_check/3.0.0", "entailment_channel": "mechanical", "independent_checks": {"valid_agreeing": 0, "cross_family_required": false, "cross_family_ok": null}}
 ```
 
 **为什么错误**：① 结论文本含 “100%/全部” → ABSOLUTE_WORDING（字段填的 judged
@@ -100,20 +106,23 @@ Verifier: {"id": "unspecified", "protocol": "gate_check/2.0.0", "entailment_chan
 
 ```text
 Evidence Gate Result
+
 Conclusion:
+抽查的 100 条记录未发现重复或关键字段缺失；整体 100 万条未验证
 Type: FACT
 Claimed strength: judged  (risk: high)
-Evidence Level: L3  (claim requires L3)
+Evidence Level: L3  (claim requires L3; independent lines: 1)
 Evidence (anchor three-stage check):
   - [direct·mech✓] sample — quote verified in anchor: tests/fixtures/qa/records-2026-11-17.csv
-  execution: executed=True valid=True env_independent=True validates_target=True
+  execution: executed=True valid=True env_independent=True validates_target=True channel=None
 Counter-evidence search context: isolated
 Findings:
-Confidence: HIGH
 Decision: PASS  (exit 0)
 Reason:
+  evidence L3 supports claimed strength 'judged' (requires L3)
 Allowed wording: 已通过实际验证 (verified)
-Verifier: {"id": "unspecified", "protocol": "gate_check/2.0.0", "entailment_channel": "mechanical"}
+Calibration: levels are ordinal, not probabilities; empirical per-level accuracy via --calibration
+Verifier: {"id": "unspecified", "protocol": "gate_check/3.0.0", "entailment_channel": "mechanical", "independent_checks": {"valid_agreeing": 0, "cross_family_required": false, "cross_family_ok": null}}
 ```
 
 **为什么正确**：① 措辞限定在样本内（“抽查的 100 条”），不使用 全部/均/100%；

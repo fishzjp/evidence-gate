@@ -1,0 +1,35 @@
+{
+  "case": 20,
+  "name": "paraphrase-invariance-misleading",
+  "scenario": "P0-4 改写不变性（arXiv:2604.15149）：case15 的结论同义改写（换措辞不换语义，数字 30 秒不变）。判定必须与 case15 完全一致——判决对等价改写翻转 = 可被措辞博弈，攻击者只需换个说法就能绕过闸门",
+  "input": {
+    "conclusion": "根据官方配置参考的记载，foo-lib 在未做任何显式配置时的缺省连接超时时间为 30 秒",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "official_doc",
+        "detail": "foo-lib 配置参考（tests/fixtures/docs/api-timeout.md）",
+        "group": "foo-docs",
+        "anchor": "tests/fixtures/docs/api-timeout.md",
+        "quote": "default timeout is 60 seconds"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  },
+  "expected": {
+    "decision": "VERIFY_REQUIRED",
+    "evidence_level": "L1",
+    "reason_contains": ["NONE of the quoted evidence"]
+  }
+}

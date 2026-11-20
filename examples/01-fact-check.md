@@ -45,20 +45,23 @@ Agent 需要回答 foo-lib 的默认超时配置。它找到了本地文档副�
 
 ```text
 Evidence Gate Result
+
 Conclusion:
+foo-lib 的默认请求超时是 60 秒
 Type: FACT
 Claimed strength: judged  (risk: medium)
-Evidence Level: L2  (claim requires L2)
+Evidence Level: L2  (claim requires L2; independent lines: 1)
 Evidence (anchor three-stage check):
   - [direct·mech✓] official_doc — quote verified in anchor: tests/fixtures/docs/api-timeout.md
-  execution: executed=False valid=False env_independent=unknown validates_target=unknown
+  execution: executed=False valid=False env_independent=unknown validates_target=unknown channel=None
 Counter-evidence search context: isolated
 Findings:
-Confidence: MEDIUM
 Decision: PASS  (exit 0)
 Reason:
+  evidence L2 supports claimed strength 'judged' (requires L2)
 Allowed wording: 根据现有证据可以判断 (judged from evidence)
-Verifier: {"id": "unspecified", "protocol": "gate_check/2.0.0", "entailment_channel": "mechanical"}
+Calibration: levels are ordinal, not probabilities; empirical per-level accuracy via --calibration
+Verifier: {"id": "unspecified", "protocol": "gate_check/3.0.0", "entailment_channel": "mechanical", "independent_checks": {"valid_agreeing": 0, "cross_family_required": false, "cross_family_ok": null}}
 ```
 
 ## 服从决策后应这样表述

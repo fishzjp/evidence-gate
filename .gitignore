@@ -5,6 +5,7 @@ __pycache__/
 # Evidence Gate runtime artifacts (may contain user conclusions — do not publish)
 .evidence-gate-log.jsonl
 *.evidence-gate-log.jsonl
+.evidence-gate-calibration.json
 
 # Generated reports (regenerate with the commands in README)
 tests/TEST-REPORT.md

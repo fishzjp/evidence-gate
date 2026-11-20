@@ -7,7 +7,8 @@
 
 > A deterministic conclusion-quality gate for AI agents — evidence levels,
 > counter-evidence checks, and wording ceilings enforced **before** a
-> conclusion ships.
+> conclusion ships. v3 adds independence collapse, heterogeneous
+> verification, temporal validity, and quote-figure consistency.
 
 Evidence Gate 是一个面向 AI Agent 的结论质量闸门（Agent Skill）。它工作在
 结论出口处：当 Agent 即将输出一条重要结论时，先核对这条结论背后的证据，
@@ -17,8 +18,16 @@ Evidence Gate 是一个面向 AI Agent 的结论质量闸门（Agent Skill）。
 它不靠提示词里的"请认真检查"起作用，而是把要求落成可执行的机制。Agent
 为每条关键结论填写一份结构化证据清单；判定脚本 `gate_check.py` 对清单做
 机械核查，输出五类决策之一，并给出允许的措辞上限。脚本是纯 Python 标准库
-实现，没有第三方依赖，单次运行约 75 毫秒。每次运行都会写入审计日志，
+实现，没有第三方依赖，单次运行约 70 毫秒。每次运行都会写入审计日志，
 事后可以回标结论的对错，从而统计各个证据等级的真实准确率。
+
+v3.0.0（"Evidence Gate 2.0"）是一次可靠性专项升级：不是把门槛抬高，而是
+补上 v2 没有问的四个问题——**谁验证的**（同模型自检是相关失效，不算交叉
+验证）、**验证的是哪条线**（100 家转载 = 1 条独立线）、**什么时候的证据**
+（2024 年的快照撑不起"当前版本"）、**证据里的数字和结论里的是否同一个**
+（引文真实存在 ≠ 引文支持结论）。A/B 实测：6 类针对性攻击在 v2 上全部
+穿透（FAR 100%），v3 全部拦截且诚实正例零误伤，旧语料完全向后兼容
+（[benchmark/AB-RESULTS.md](benchmark/AB-RESULTS.md)）。
 
 > Evidence Gate 是验证与质量控制机制，不是正确性证明器。它能降低
 > "未经验证的错误结论流入最终输出"的风险，但不能保证结论一定正确。
@@ -73,8 +82,19 @@ Agent 输出关键结论时有五类高频失效。危险之处在于，这五�
 | 相关冒充因果 | 发布后错误率上升，于是说"新版本导致的" | 时间相关只是间接证据 |
 | 引用冒充支持 | 附上一个真实链接 | 实测约半数真实引用并不支持其结论 |
 
+v3 又补上五类更隐蔽的（v2 全部放行、v3 全部拦截，均有 A/B 实证）：
+
+| 失效（v3 新增识别） | 样子 | 实质 |
+|--------------------|------|------|
+| 误导性引文 | 引文逐字在文件里，但结论说 30s、引文说 60s | 引用存在 ≠ 引用支持结论的数字 |
+| 相关证据冒充独立 | 同一宿主两篇"独立报道" | 通稿转载：100 家转载 = 1 条独立线 |
+| 过期证据冒充现状 | 2024 年快照撑"当前版本" | 旧证据对历史断言成立，对"当前"不成立 |
+| 同模型自检冒充交叉验证 | glm 生成、glm"独立"复查 | 同家族模型同错率约 60%；一致只配路由，不配裁决 |
+| 通道错配冒充验证 | 读代码推理后宣布"已验证" | 机器可判的声明必须走机器通道 |
+
 这不是态度问题，而是机制问题。2024–2026 年的研究反复验证了几个结论
-（引用均已逐条核实，详见 [docs/research-survey.md](docs/research-survey.md)）：
+（引用均已逐条核实，详见 [docs/research-survey.md](docs/research-survey.md)
+与 [docs/research-survey-2.md](docs/research-survey-2.md)）：
 
 - **自我验证靠不住。** 让模型检查自己的答案，在没有外部反馈的情况下几乎
   不会产生增益（Huang et al., ICLR 2024）。
@@ -83,6 +103,10 @@ Agent 输出关键结论时有五类高频失效。危险之处在于，这五�
 - **引用存在不等于引用支持。** 对真实 Agent 引用的实测显示，51.5% 的网络
   引用被误用；医学场景中 50%–90% 的引用不支持或仅部分支持其结论
   （Stanford 2024；SourceCheckup 2025）。
+- **同家族验证是相关失效。** 同家族模型同错率约 60%，模型越大越相关；
+  9 个同分布裁判 ≈ 2 票有效；高一致案例中近半数是错的（ICML 2025；
+  arXiv:2605.29800；arXiv:2607.08065）——所以跨家族模型或确定性工具
+  才算异构验证。
 - **Agent 会在不该回答的问题上硬答。** 实验中 59.5% 的高风险不可答问题
   被莽撞作答（AgentAbstain 2025）。
 
@@ -92,15 +116,21 @@ Agent 输出关键结论时有五类高频失效。危险之处在于，这五�
 
 ## 核心机制
 
-三条核心规则，全部由脚本机械执行，不依赖任何自觉：
+四条核心规则，全部由脚本机械执行，不依赖任何自觉：
 
-1. **先验证再下结论。** 能执行就执行，能查询就查询，能读源码就读源码。
+1. **先验证再下结论，且走对通道。** 能执行就执行，能查询就查询，能读源码
+   就读源码；机器可判的声明（代码行为/配置/数据/数学）必须走机器通道，
+   语言推理不算验证。
 2. **结论强度不超过证据强度。** 证据分为 L0–L4 五个等级，每个等级对应
    一个措辞上限。脚本会扫描结论*原文*来识别绝对化措辞、因果断言和
    "可以正常运行"类声明；自评字段填得再低，原文里的"全部""100%"照样
-   会被抓出来。
+   会被抓出来。证据强度按**独立性塌缩后**计数——同宿主转载、近似引文、
+   互相引用的证据线合并成一条。
 3. **无法确认就明说。** 当决定性的证据无法获得时，输出 ABSTAIN，明确
-   说"目前无法确认"并说明缺口在哪里，而不是给一个语气温和的猜测。
+   说"目前无法确认"并说明缺口在哪里（以及为什么拿不到），而不是给一个
+   语气温和的猜测。
+4. **谁验证的很重要。** "已交叉验证"要求异构验证：跨模型家族的独立核查，
+   或确定性工具的核实。同模型自检的一致是相关失效，不是验证。
 
 每条关键结论都要走一遍闸门循环。左侧是 Agent 的职责，右侧是脚本的
 判定步骤，完整说明见 [SKILL.md](SKILL.md)：
@@ -108,12 +138,13 @@ Agent 输出关键结论时有五类高频失效。危险之处在于，这五�
 ```
 Agent 侧                    脚本侧（确定性）
 ────────                    ──────────────
-1 识别结论、分类类型         ① 文本扫描：绝对化 / 因果 / works / 风险关键词
-2 先执行能执行的验证         ② 锚点三段式：锚点可解析 → 内容实读 → 引文在文中
-3 收集带锚点的证据           ③ 验证有效性：执行过 × 环境干净 × 测试覆盖目标
-4 隔离式反证搜寻             ④ 等级推导：实际等级 vs 所需等级
-5 运行判定脚本  ──────────→  ⑤ 反证状态、隔离要求、样本推总体检查
-6 服从决策                   ⑥ 五类决策（按序求值）+ 审计日志
+1 识别结论、分类类型+路由     ① 文本扫描：绝对化 / 因果 / works / 风险关键词
+2 先执行能执行的验证（按通道） ② 锚点三段式：锚点可解析 → 内容实读 → 引文在文中
+3 收集带锚点+溯源的证据       ③ 验证有效性：执行过 × 环境干净 × 覆盖目标 × 通道匹配
+4 隔离式反证搜寻             ④ 数字一致性：结论的数字必须出现在引文里
+5 异构独立核查（跨家族/工具）  ⑤ 时间有效性 + 同源塌缩（独立线按塌缩后计）
+6 运行判定脚本  ──────────→  ⑥ 等级推导：实际等级 vs 所需等级
+7 服从决策                   ⑦ 反证状态、隔离要求、样本推总体、五类决策 + 账本 + 日志
 ```
 
 ### 证据等级 L0–L4 与措辞上限
@@ -123,8 +154,8 @@ Agent 侧                    脚本侧（确定性）
 | L0 | 无证据（猜测、记忆、"应该行"） | 假设 / 推测 |
 | L1 | 间接信号（日志症状、时间相关、小样本） | 可能 / 初步判断 |
 | L2 | 带锚点的直接证据，且内容确实支持结论（引文经机械核验） | 根据现有证据可以判断 |
-| L3 | 实际执行并观察过（跑过、测过） | 已通过实际验证 |
-| L4 | 至少两条独立证据线一致，且反证搜寻在隔离上下文完成 | 已交叉验证 |
+| L3 | 实际执行并观察过（跑过、测过）；多条 attested 证据线也止步于此 | 已通过实际验证 |
+| L4 | 塌缩后 ≥2 条独立线一致，至少一条经机械核实（引文核对/工具/跨家族核查），反证搜寻在隔离上下文完成 | 已交叉验证 |
 
 ### 五类决策
 
@@ -138,20 +169,38 @@ Agent 侧                    脚本侧（确定性）
 
 输入格式错误时 exit 2。非零退出码可以直接接入 CI 断言。
 
-### 四个进阶机制
+### 进阶机制
+
+v2 的四个机制之上，v3 新增五个（每条都有正例防误伤，A/B 见
+[benchmark/AB-RESULTS.md](benchmark/AB-RESULTS.md)）：
 
 - **锚点三段式核查。** 一条引用要过三关：锚点可以解析、内容被实际读过、
   引文确实出现在文中（本地文件由脚本机械比对）。只过第一关的"引用存在"
   会被降级为间接证据。
+- **数字一致性（MISLEADING_QUOTE）。** 结论声称的数字必须出现在引文里：
+  结论说 30 秒而引文都说 60 秒时，引文线降级为间接证据。规则刻意窄化
+  （单个带单位数字 + 未执行 + 特定类型），宽规则曾误伤 5/10 条诚实结论。
+- **独立性塌缩（CORRELATED_EVIDENCE）。** 同声明组、同 URL 宿主（可申诉）、
+  近似引文（Jaccard≥0.7）、互相引用的证据线合并为一条独立线；聚合源
+  （转载站）支持限定声明但永不构成独立线。100 家转载 = 1 条独立线。
+- **时间有效性。** 证据带 as_of；"当前版本"类时效声明建立在过期快照上
+  会被降级。历史断言锚定时点（claim_time）后用同期证据评判——旧≠错，
+  但旧≠当前。
+- **异构验证要求 + attested 封顶。** "已交叉验证"（高风险）需要跨家族
+  模型核查或工具核实（`verified_by: "tool:..."`）；全是"我看过、支持"
+  的自报证据线封顶 L3——存在证据 ≠ 证据被检验。
 - **隔离反证要求。** 声明"已交叉验证"或使用绝对化措辞时，反证搜寻必须在
   与结论不同的上下文中进行：先写下"什么证据能推翻我"，此时不看支持性
   证据，然后再去搜索。同上下文的搜索会直接得到 VERIFY_REQUIRED。
 - **不可逆动作前置闸门（G3）。** 加上 `--gate-point pre-action` 运行时，
-  风险等级自动升一档；"不会中断"这类声明必须实际演练过；原本的
-  PASS_WITH_CAVEAT 也会收紧为 VERIFY_REQUIRED。
-- **审计与校准回路。** 每次运行都追加一条 JSONL 日志，记录 gate_id、
-  决策和等级。事后用 `--mark-outcome` 回标对错，用 `--calibration`
-  统计各等级的真实准确率。自报等级准不准，要测量了才知道。
+  低/中风险自动升为高风险（高/极高保持不变）；任何"不会中断"类 works
+  声明都必须实际演练过（works 门槛降到 possibly）。
+- **审计与校准回路。** 每次运行都追加一条 JSONL 日志（含逐线账本
+  ledger：锚点/通道/来源层级/日期/塌缩关系）。事后用 `--mark-outcome`
+  回标对错，用 `--calibration` 统计各等级真实准确率（v3 附 Wilson 置信
+  区间、单调性检查、风险-覆盖曲线、弃权 P/R、错误归因），`--emit-overrides`
+  可把校准结果变成强制措辞上限。v3 移除了启发式 confidence 字段——
+  规则推出来的"信心"本身就是未验证的声明；等级是序数，校准只来自测量。
 
 ## 安装
 
@@ -217,7 +266,7 @@ python3 scripts/gate_check.py gate-input.json
 输出如下（真实输出的节选）：
 
 ```text
-Evidence Level: L2  (claim requires L2)
+Evidence Level: L2  (claim requires L2; independent lines: 1)
 Evidence (anchor three-stage check):
   - [direct·mech✓] official_doc — quote verified in anchor: tests/fixtures/docs/api-timeout.md
 Decision: PASS  (exit 0)
@@ -227,14 +276,16 @@ Allowed wording: 根据现有证据可以判断 (judged from evidence)
 这个例子能通过，是因为三个条件都成立：引文机械核验通过（那行字确实在
 文件里）、反证被核实排除（锁文件确认了版本）、声明强度与证据等级匹配。
 
-不妨亲手试一下：把引文改成 `"default timeout is 30 seconds"` 再运行同一
-条命令。这次会得到 `ANCHOR_QUOTE_MISSING`，证据被降级，决策变为
-`VERIFY_REQUIRED (exit 10)`。这就是"引用存在不等于引用支持"的机械执行。
+不妨亲手试两个变体：把引文改成 `"default timeout is 30 seconds"` 再运行
+同一命令，会得到 `ANCHOR_QUOTE_MISSING`，证据被降级，决策变为
+`VERIFY_REQUIRED (exit 10)`。或者保持引文不变、把结论改成"默认请求超时
+是 30 秒"——引文真实存在，但结论的数字不在任何引文里，v3 的
+`MISLEADING_QUOTE` 照样拦截。这就是"引用存在不等于引用支持"的机械执行。
 
 ## 示例
 
-仓库提供十个完整示例，全部附带脚本的真实输出，覆盖全部五类决策。
-入口在 [examples/](examples/README.md)：
+仓库提供十四个完整示例，全部附带脚本的真实输出，覆盖全部五类决策与
+v3 新机制。入口在 [examples/](examples/README.md)：
 
 | 主题 | 教训 |
 |------|------|
@@ -248,6 +299,10 @@ Allowed wording: 根据现有证据可以判断 (judged from evidence)
 | [高风险与不可逆动作](examples/08-high-risk-preaction.md) | pre-action 前置闸门 |
 | [BAD 与 GOOD 对照](examples/09-bad-good.md) | 同一份数据的两种表述（REJECT 到 PASS） |
 | [完整工作流](examples/10-agent-workflow.md) | 从任务到最终回答的全过程 |
+| [误导性引文](examples/11-misleading-quote.md) | 引文真实存在 ≠ 引文支持结论的数字（v3） |
+| [相关证据](examples/12-correlated-evidence.md) | 同宿主转载塌缩：100 家转载 = 1 条独立线（v3） |
+| [异构交叉验证](examples/13-heterogeneous-crosscheck.md) | 跨家族核查 + 机械引文线 = 名副其实的 L4（v3） |
+| [带强制保留的放行](examples/14-pass-with-caveat.md) | 结论成立，但解释过的反证必须随结论输出（PASS_WITH_CAVEAT） |
 
 ## CLI 速查
 
@@ -258,34 +313,54 @@ python3 scripts/gate_check.py <input.json>          # 人类可读结果
 ... | python3 scripts/gate_check.py --offline -     # 不抓取 URL（离线或敏感网络）
 python3 scripts/gate_check.py --no-log ...          # 一次性运行，不写日志
 python3 scripts/gate_check.py --log PATH ...        # 指定日志文件
-python3 scripts/gate_check.py --mark-outcome <gate_id> correct|wrong   # 校准回标
-python3 scripts/gate_check.py --calibration         # 各等级的真实准确率
+python3 scripts/gate_check.py --mark-outcome <gate_id> correct|incorrect|unknown  # 校准回标
+python3 scripts/gate_check.py --calibration         # 各等级真实准确率（含 Wilson CI）
+python3 scripts/gate_check.py --calibration --emit-overrides  # 校准→强制措辞上限
 ```
 
-开发与回归用三条命令：
+开发与回归用四条命令：
 
 ```bash
-python3 tests/run_tests.py --report     # 14 个回归用例 + 3 个 CLI 子测试
-python3 benchmark/run_benchmark.py      # 23 条真值语料（FAR/FRR 门禁）
+python3 tests/run_tests.py --report     # 26 个回归用例（含改写不变性）+ 3 个 CLI 子测试
+python3 benchmark/run_benchmark.py      # 33 条真值语料（FAR/FRR 门禁）
+python3 benchmark/run_ab.py             # v2 vs v3 A/B 对照（升级效果实测）
 python3 tests/validate_skill.py         # SKILL.md 结构与引用完整性
 ```
 
 ## Benchmark
 
 **已测量：闸门级基准。** 它是确定性的，可以随时复现，结果快照在
-[benchmark/RESULTS.md](benchmark/RESULTS.md)：
+[benchmark/RESULTS.md](benchmark/RESULTS.md)。语料分两个套件：core 23 条
+（v2 时代的原始标签；22 条输入未改动，p03 增补了可选 v3 字段——见下）
++ adversarial 10 条（v3 攻击/正例）：
 
-| 指标 | 结果（23 条真值标注语料） |
-|------|--------------------------|
-| Accuracy | 23/23 (100%) |
-| False Acceptance Rate（应拦未拦，过度声明流出） | 0/13 (0%) |
-| False Rejection Rate（应放被拦，误伤诚实结论） | 0/10 (0%) |
-| 时延 | 约 75 ms/条（含解释器启动，单机） |
+| 指标 | core（23 条） | adversarial（10 条） |
+|------|---------------|----------------------|
+| Accuracy | 23/23 (100%) | 10/10 (100%) |
+| False Acceptance Rate（应拦未拦） | 0/13 (0%) | 0/6 (0%) |
+| False Rejection Rate（应放被拦） | 0/10 (0%) | 0/4 (0%) |
+| 时延 | 约 60–130 ms/条（含解释器启动，单机，随负载浮动） | 同左 |
 
 用 `python3 benchmark/run_benchmark.py` 即可复现。这个命令同时也是 CI
-门禁：只要 FAR 或 FRR 不为零，就退出非零。需要说明它的局限：语料由维护者
-构造，可能带有构造者偏差；并且它测的是闸门判定器本身，而不是端到端的
-Agent 表现。
+门禁：只要 FAR 或 FRR 不为零，就退出非零。
+
+**v2 vs v3 A/B（同一输入喂两版，[benchmark/AB-RESULTS.md](benchmark/AB-RESULTS.md)）：**
+
+| 套件 | Gate | Accuracy | FAR | FRR |
+|------|------|----------|-----|-----|
+| adversarial | v2.0.0（升级前快照） | 40.0% | **6/6 (100%)** | 0/4 |
+| adversarial | **v3.0.0** | **100%** | **0/6 (0%)** | **0/4** |
+| core | v2.0.0 | 100% | 0/13 | 0/10 |
+| core | v3.0.0 | 100% | 0/13 | 0/10 |
+
+解读纪律：adversarial 套件按 v3 认识论构造（独立性/异构性/时效），v2 在其上
+全穿透是升级目标的度量；core 套件保留 v2 标签，v3 零回归说明新规则没有为
+拦截新攻击付出旧能力的代价。**披露一处 core 输入适配**：p03 增补了可选
+v3 字段（`verified_by: "tool:..."` 及 detail 点名工具），使其诚实的工具
+验证线对 v3 可见——v2 忽略新字段、判定不变（两版都 PASS L4）；未适配的
+原始输入上 v3 判 VERIFY_REQUIRED（工具线不可见，从严），标签不变。
+需要说明的局限：语料由维护者构造，存在构造者
+偏差；并且它测的是闸门判定器本身，而不是端到端的 Agent 表现。
 
 **未测量：Agent 级对比。** baseline agent 与 agent+gate 的端到端对比协议
 已经写好（[benchmark/AGENT-PROTOCOL.md](benchmark/AGENT-PROTOCOL.md)），
@@ -304,18 +379,23 @@ Agent 表现。
 3. **验证器也会犯错。** 判定规则是启发式的，包括关键词扫描、引文匹配和
    等级算术，因此存在误报和漏报。已知中文绝对化关键词可能在个别边界
    措辞上误触发；实测 FAR/FRR 为零，但语料存在构造者偏差。
-4. **同模型验证存在相关性失效。** 隔离反证要求能缓解同意偏差，但同一个
-   模型的先验会同时污染支持面和反证面。这是缓解，不是根除。
-5. **验证有成本。** 每条关键结论多一次脚本运行（约 75 毫秒），外加填写
-   证据清单的注意力开销。过度验证浪费，验证不足危险，风险分级就是为了
-   把预算花在对的地方。
+4. **同模型验证存在相关性失效（v3 已部分缓解）。** v3 起高风险"已交叉
+   验证"要求跨家族模型或确定性工具核查，同家族自检不再计数。但家族判定
+   按标识符首词近似（glm-5.3 与 glm-4 同家族），混合架构可能误判；且
+   异构验证降低的是相关失效概率，不是零。这是缓解的深化，不是根除。
+5. **验证有成本。** 每条关键结论多一次脚本运行（约 0.1 秒），外加填写
+   证据清单的注意力开销。过度验证浪费，验证不足危险，风险分级（五级
+   验证阶梯 + 通道路由）就是为了把预算花在对的地方。
 6. **有些事实无法用现有工具验证。** 例如没有权限、事件不可复现、数据
    不可及。此时正确行为是 ABSTAIN，而不是被闸门逼出一个猜测。
 7. **不替代形式化验证。** 它不证明程序正确性，也不证明定理。可形式化的
    性质请交给模型检查器或定理证明器。
 8. **Evidence Level 不是概率意义上的置信度。** L0–L4 是措辞天花板（序数
-   刻度），不是校准过的正确概率。校准回路是被动闭环，依赖事后回标的
-   outcome 数据，冷启动阶段不构成约束。
+   刻度），不是校准过的正确概率——v3 因此移除了启发式 confidence 字段。
+   校准回路是被动闭环，依赖事后回标的 outcome 数据，冷启动阶段不构成
+   约束。语义级转载检测（同一通稿的非逐字改写）、无真值场景下蕴含判断
+   ~71% 的准确率上限等开放问题见
+   [docs/research-survey-2.md](docs/research-survey-2.md) §5。
 
 除以上八条，还有一个结构性边界：**自报字段可以造假**。`content_supports`
 和 `counter_search_context` 这类字段由填写者声明，脚本无法核实其真伪；
@@ -351,24 +431,29 @@ Agent 表现。
 
 **它会让 Agent 变得过度谨慎吗？**
 项目专门做了防过度阻塞设计：When NOT to gate 白名单、风险分级、降级
-重跑永远合法、简单事实简单检查。实测 FRR 为 0/10，诚实结论零误伤。如果
-你发现了误伤用例，欢迎提交语料——benchmark 存在的意义就在于此。
+重跑永远合法、简单事实简单检查，且每条 v3 新规则都配了防误伤正例
+（异构交叉验证正例、历史声明正例、聚合源限定声明正例、机械通道正例）。
+实测 FRR 为 0/14，诚实结论零误伤；改写不变性用例锁定同义改写不翻转判定。
+如果你发现了误伤用例，欢迎提交语料——benchmark 存在的意义就在于此。
 
 ## 架构与仓库结构
 
 完整的判定管线，以及每个模块的输入、输出、职责和失败情况，写在
-[ARCHITECTURE.md](ARCHITECTURE.md) 里。设计所依据的文献调研（引用逐条
-核实）在 [docs/research-survey.md](docs/research-survey.md)。
+[ARCHITECTURE.md](ARCHITECTURE.md) 里。设计所依据的两轮文献调研（引用
+逐条核实）在 [docs/research-survey.md](docs/research-survey.md) 与
+[docs/research-survey-2.md](docs/research-survey-2.md)；本次升级的完整
+报告（十节结构）在 [docs/final-report-v3.md](docs/final-report-v3.md)。
 
 ```
 evidence-gate/
 ├── SKILL.md              # Agent 阅读的主文档（触发条件 + 闸门工作流）
 ├── scripts/gate_check.py # 确定性判定器（零依赖 Python）
 ├── references/           # 等级定义 / 判定矩阵 / 失效模式 / 风险分级
-├── examples/             # 十个带真实输出的示例
-├── benchmark/            # 真值语料 + 运行器 + Agent 级协议
-├── tests/                # 回归用例 + CLI 子测试 + skill 校验
-└── docs/research-survey.md
+├── examples/             # 十四个带真实输出的示例
+├── benchmark/            # 真值语料（core+adversarial）+ 运行器 + A/B + Agent 级协议
+│   └── legacy/           # v2.0.0 判定器快照（A/B 基线）
+├── tests/                # 回归用例（含改写不变性）+ CLI 子测试 + skill 校验
+└── docs/                 # 两轮文献调研 + 最终报告
 ```
 
 ## 参与贡献

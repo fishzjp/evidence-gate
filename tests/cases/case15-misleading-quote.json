@@ -1,0 +1,35 @@
+{
+  "case": 15,
+  "name": "misleading-quote",
+  "scenario": "P0-A 误导性证据（v3）：引文真实存在于锚点（60s 在文档里），但结论声称的数字是 30s——'引文存在'≠'引文支持结论'。数字一致性检查应把引文线降级为间接证据并拦截",
+  "input": {
+    "conclusion": "foo-lib 的默认超时是 30 秒，配置参考明确写明",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "official_doc",
+        "detail": "foo-lib 配置参考（tests/fixtures/docs/api-timeout.md）",
+        "group": "foo-docs",
+        "anchor": "tests/fixtures/docs/api-timeout.md",
+        "quote": "default timeout is 60 seconds"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  },
+  "expected": {
+    "decision": "VERIFY_REQUIRED",
+    "evidence_level": "L1",
+    "reason_contains": ["NONE of the quoted evidence"]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "case": 16,
+  "name": "correlated-evidence",
+  "scenario": "P0-B 相关证据（v3）：同宿主两篇'独立报道'实为同一通稿转载——同源塌缩后独立线从 3 掉到 2，'已交叉验证'失去机械通道支撑，只到 L3。100 家转载 ≠ 100 个独立来源",
+  "input": {
+    "conclusion": "foo-lib 3.2 存在连接池泄漏，已交叉验证",
+    "type": "EXPERIMENT_RESULT",
+    "claimed_strength": "cross_verified",
+    "risk_tier": "high",
+    "evidence": [
+      {
+        "kind": "test_result",
+        "detail": "本地复现脚本泄漏计数上升 run#771",
+        "group": "local-run"
+      },
+      {
+        "kind": "official_doc",
+        "detail": "https://news.example.com/tech/foo-lib-leak 报道连接池泄漏",
+        "content_supports": "supported",
+        "group": "news-a"
+      },
+      {
+        "kind": "official_doc",
+        "detail": "https://news.example.com/tech/foo-lib-leak-confirmed 转载确认连接池泄漏",
+        "content_supports": "supported",
+        "group": "news-b"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "本地脚本复现泄漏",
+      "env_independent": true,
+      "validates_target": true
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  },
+  "expected": {
+    "decision": "VERIFY_REQUIRED",
+    "evidence_level": "L3",
+    "reason_contains": ["requires L4, evidence is only L3"],
+    "output_equals": { "independent_lines": 2 }
+  }
+}

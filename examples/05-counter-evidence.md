@@ -40,23 +40,31 @@ Agent 声称新正则引擎“在所有基准用例上均优于旧引擎”。�
 
 ```text
 Evidence Gate Result
+
 Conclusion:
+新正则库 re2-lite 在全部 20 个基准用例上性能均优于 JavaScript 内置 RegExp
 Type: FACT
 Claimed strength: absolute  (risk: high)
-Evidence Level: L3  (claim requires L4)
+Evidence Level: L3  (claim requires L4; independent lines: 0)
 Evidence (anchor three-stage check):
   - [indirect*] test_result — anchor path does not exist / unreadable: bench/results-2026-11-16.json
-  execution: executed=True valid=True env_independent=True validates_target=True
+  execution: executed=True valid=True env_independent=True validates_target=True channel=None
 Counter-evidence search context: same
 Findings:
-Confidence: LOW
+  [high] ABSOLUTE_WORDING: absolute wording detected in conclusion; claimed_strength escalated 'judged' -> 'absolute'
+  [high] ANCHOR_MISSING: anchor not resolvable — anchor path does not exist / unreadable: bench/results-2026-11-16.json
+  [high] CONTRA_EVIDENCE_UNADDRESSED: unaddressed CONTRADICTING counter-evidence: “同一份结果文件：用例 #17（长回溯模式）re2-lite 慢 40%，与『均优于』直接矛盾”
+  [high] COUNTER_SEARCH_NOT_ISOLATED: counter-evidence search ran in the SAME context as the conclusion (agreement bias): a cross-verified claim requires an isolated-context search or a mechanical falsification attempt (SGV, ICLR 2026)
+  [reject] FACT_CONTRADICTED: a FACT conclusion cannot be output while a direct contradiction is unaddressed
 Decision: REJECT  (exit 20)
 Reason:
+  a FACT conclusion cannot be output while a direct contradiction is unaddressed; absolute wording detected in conclusion; claimed_strength escalated 'judged' -> 'absolute'; anchor not resolvable — anchor path does not exist / unreadable: bench/results-2026-11-16.json; unaddressed CONTRADICTING counter-evidence: “同一份结果文件：用例 #17（长回溯模式）re2-lite 慢 40%，与『均优于』直接矛盾”; counter-evidence search ran in the SAME context as the conclusion (agreement bias): a cross-verified claim requires an isolated-context search or a mechanical falsification attempt (SGV, ICLR 2026)
 Allowed wording: 已通过实际验证 (verified)
+Calibration: levels are ordinal, not probabilities; empirical per-level accuracy via --calibration
 Required actions:
   - address or refute the contradicting counter-evidence before asserting this conclusion
   - rerun the counter-evidence search in an isolated context (fresh session without the conclusion, or an independent agent), or attempt mechanical falsification
-Verifier: {"id": "unspecified", "protocol": "gate_check/2.0.0", "entailment_channel": "none"}
+Verifier: {"id": "unspecified", "protocol": "gate_check/3.0.0", "entailment_channel": "none", "independent_checks": {"valid_agreeing": 0, "cross_family_required": false, "cross_family_ok": null}}
 ```
 
 ## 服从决策后应这样表述

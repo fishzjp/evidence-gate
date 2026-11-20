@@ -1,0 +1,33 @@
+{
+  "case": 26,
+  "name": "unobtainable-reason",
+  "scenario": "P0-G 弃答分类学（v3）：证据不可得时不仅要 ABSTAIN，还要在输出里记录不可得的具体原因（unobtainable_reason=nonexistent：核查对象本身不存在），让'拒答'可审计、可分类、可改进，而不是一句笼统的'不知道'",
+  "input": {
+    "conclusion": "bar-cli 2.x 提供 --dry-run 参数",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence_obtainable": "no",
+    "unobtainable_reason": "nonexistent",
+    "evidence": [
+      {
+        "kind": "memory",
+        "detail": "印象里某次团队演示中见过这个参数，但 bar-cli 及其文档已无法访问"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "generalization": null
+  },
+  "expected": {
+    "decision": "ABSTAIN",
+    "reason_contains": ["not obtainable"],
+    "output_equals": { "unobtainable_reason": "nonexistent" }
+  }
+}

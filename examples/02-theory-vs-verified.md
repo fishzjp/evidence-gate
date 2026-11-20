@@ -34,25 +34,28 @@ Agent 逐行审阅了重构 diff，接口签名兼容、调用点全部更新，
 
 ```text
 Evidence Gate Result
+
 Conclusion:
+这个重构方案可以正常运行，不会破坏现有功能
 Type: INFERENCE
 Claimed strength: judged  (risk: medium)
-Evidence Level: L2  (claim requires L3)
+Evidence Level: L2  (claim requires L3; independent lines: 1)
 Evidence (anchor three-stage check):
   - [direct·trace-only] source_code — 逐行审阅重构 diff（PR #77，src/ 目录 12 个文件）：接口签名兼容、调用点全部更新 (anchor not mechanically checkable)
-  execution: executed=False valid=False env_independent=unknown validates_target=unknown
+  execution: executed=False valid=False env_independent=unknown validates_target=unknown channel=None
 Counter-evidence search context: same
 Findings:
-Confidence: LOW
 Decision: VERIFY_REQUIRED  (exit 10)
 Reason:
+  claimed strength 'judged' requires L3, evidence is only L2 (works/viability claim without execution): conclusion strength exceeds evidence strength — execute the actual verification (run it), or downgrade the wording to the allowed strength and rerun the gate
 Allowed wording: 可能/初步判断 (possibly / preliminary) — 未实际运行验证 (not actually executed/verified)
+Calibration: levels are ordinal, not probabilities; empirical per-level accuracy via --calibration
 Mandatory caveats (must appear in output):
   - counter-evidence search was same-context; coverage may be limited by agreement bias
 Required actions:
   - execute the actual verification: run the program / tests / benchmark instead of reasoning about it
   - or downgrade the wording and rerun the gate with the lower claim
-Verifier: {"id": "unspecified", "protocol": "gate_check/2.0.0", "entailment_channel": "none"}
+Verifier: {"id": "unspecified", "protocol": "gate_check/3.0.0", "entailment_channel": "none", "independent_checks": {"valid_agreeing": 0, "cross_family_required": false, "cross_family_ok": null}}
 ```
 
 ## 服从决策后应这样表述

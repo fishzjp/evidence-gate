@@ -20,6 +20,7 @@
         "kind": "test_result",
         "detail": "独立扫描工具 trivy 在 CI 中扫描最终镜像：0 个高危项、无异常文件层（CI job scan #771，已人工核对扫描日志）",
         "group": "trivy-scan",
+        "verified_by": "tool:trivy",
         "content_supports": "supported"
       },
       {

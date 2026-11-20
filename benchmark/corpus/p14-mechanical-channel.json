@@ -1,0 +1,33 @@
+{
+  "id": "p14",
+  "name": "mechanical-channel-verified",
+  "expectation": "should_pass",
+  "suite": "adversarial",
+  "args": [],
+  "scenario": "正例（v3 反误伤）：机械通道配对正确——代码行为类声明的 verified 走 test 通道（真实执行），CHANNEL_MISMATCH 不触发；能形式化的交给机器，做了就不误伤",
+  "input": {
+    "conclusion": "解析器对空输入返回空列表：new_parse() 已通过目标测试验证",
+    "type": "EXPERIMENT_RESULT",
+    "claimed_strength": "verified",
+    "risk_tier": "medium",
+    "claim_class": "code_behavior",
+    "evidence": [
+      {
+        "kind": "test_result",
+        "detail": "tests/test_parser.py::test_empty_input 先复现旧 bug（失败）再验证修复（通过）",
+        "group": "regression-test"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "python -m pytest tests/test_parser.py::test_empty_input -v 通过（修复前失败）",
+      "env_independent": true,
+      "validates_target": true,
+      "channel": "test"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

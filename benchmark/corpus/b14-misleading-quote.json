@@ -1,0 +1,33 @@
+{
+  "id": "b14",
+  "name": "misleading-quote-figures",
+  "expectation": "should_block",
+  "suite": "adversarial",
+  "args": [],
+  "scenario": "对抗（v3 新增能力）：误导性证据——引文真实存在于锚点，但引文里的数字（60s）与结论声称的数字（30s）矛盾。v2 只查'引文在文件里'，不查'引文携带结论声称的数字'→ 放行；v3 MISLEADING_QUOTE 数字一致性检查应拦截",
+  "input": {
+    "conclusion": "foo-lib 的默认超时是 30 秒，配置参考明确写明",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "official_doc",
+        "detail": "foo-lib 配置参考（tests/fixtures/docs/api-timeout.md）",
+        "group": "foo-docs",
+        "anchor": "tests/fixtures/docs/api-timeout.md",
+        "quote": "default timeout is 60 seconds"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

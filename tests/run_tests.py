@@ -29,8 +29,10 @@ STRENGTH_ORDER = ["hypothesis", "possibly", "likely", "judged", "verified", "cro
 
 def run_case(case: dict) -> dict:
     """Run one case through gate_check.py, return a result record."""
-    cmd = [sys.executable, str(GATE_SCRIPT), "--json", "--no-log", "-"] \
-        + case.get("args", [])
+    # --offline: URL anchors deterministically take the unfetched path, so
+    # results never depend on network reachability (CI-safe, reproducible)
+    cmd = [sys.executable, str(GATE_SCRIPT), "--json", "--no-log",
+           "--offline", "-"] + case.get("args", [])
     proc = subprocess.run(
         cmd,
         input=json.dumps(case["input"], ensure_ascii=False),
@@ -86,6 +88,10 @@ def run_case(case: dict) -> dict:
         ok = allowed in (None, cap) or STRENGTH_ORDER.index(allowed) <= STRENGTH_ORDER.index(cap)
         result["checks"].append((f"allowed_strength <= {cap}", ok, allowed))
         result["ok"] &= ok
+    for field, want in (exp.get("output_equals") or {}).items():
+        ok = act.get(field) == want
+        result["checks"].append((f"output.{field} == {want!r}", ok, act.get(field)))
+        result["ok"] &= ok
     return result
 
 
@@ -125,10 +131,12 @@ def render_report(results: list) -> str:
         lines.append(f"**场景**：{r['scenario']}")
         lines.append("")
         lines.append("```")
-        lines.append(f"Evidence Level : {r['actual'].get('evidence_level')}")
+        lines.append(f"Evidence Level : {r['actual'].get('evidence_level')} "
+                     f"(independent lines: {r['actual'].get('independent_lines')})")
         lines.append(f"Decision       : {r['actual'].get('decision')} (exit {r['exit_code']})")
-        lines.append(f"Confidence     : {r['actual'].get('confidence')}")
         lines.append(f"Allowed wording: {r['actual'].get('allowed_wording') or r['actual'].get('allowed_strength')}")
+        if r['actual'].get('unobtainable_reason'):
+            lines.append(f"Unobtainable   : {r['actual'].get('unobtainable_reason')}")
         lines.append(f"Reason         : {r['actual'].get('reason')}")
         req = r["actual"].get("required_actions")
         if req:
@@ -147,7 +155,9 @@ def run_cli_checks() -> list:
     """P0-5: audit log + calibration loop CLI behaviors."""
     import tempfile
     checks = []
-    log = tempfile.mktemp(suffix=".jsonl")
+    tf = tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False)
+    tf.close()
+    log = tf.name
     inp = {"conclusion": "CLI 冒烟测试结论", "type": "FACT", "claimed_strength": "judged",
            "risk_tier": "low",
            "evidence": [{"kind": "official_doc",
@@ -213,14 +223,13 @@ def main() -> int:
             if not ok:
                 print(f"       ✗ {label} (got: {detail})")
     report = render_report(results)
+    cli = run_cli_checks()
     if "--report" in sys.argv:
-        cli = run_cli_checks()
         report += "\n## CLI 行为子测试（审计日志 / 校准回路，P0-5）\n\n"
         for label, ok, detail in cli:
             report += f"- {'✅' if ok else '❌'} {label} → {detail}\n"
         REPORT_PATH.write_text(report, encoding="utf-8")
         print(f"\nReport written to {REPORT_PATH}")
-    cli = run_cli_checks()
     cli_fail = 0
     for label, ok, detail in cli:
         if not ok:

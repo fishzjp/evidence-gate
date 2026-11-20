@@ -1,0 +1,33 @@
+{
+  "id": "p13",
+  "name": "aggregator-scoped-claim",
+  "expectation": "should_pass",
+  "suite": "adversarial",
+  "args": [],
+  "scenario": "正例（v3 反误伤）：聚合源降级不误伤有限声明——结论如实限定为'据聚合转载报道'（judged 强度，不冲 L4），聚合源只被排除在独立性计数之外，不禁止 L2 支持",
+  "input": {
+    "conclusion": "据多家科技媒体的聚合转载报道，foo-lib 3.2 疑似存在连接池泄漏",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "official_doc",
+        "detail": "https://techwire.example.com/aggregate/foo-lib-leisk 聚合站汇总的转载报道",
+        "content_supports": "supported",
+        "source_tier": "aggregator",
+        "group": "aggregator"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

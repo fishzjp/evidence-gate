@@ -1,0 +1,36 @@
+{
+  "case": 23,
+  "name": "historical-claim",
+  "scenario": "P0-C 反误伤（v3）：历史性声明锚定明确时点（claim_time 2024-06），证据 as_of 恰好覆盖该时点——旧证据对历史断言是正确的，时效规则不得误伤（'最新≠正确'）。与 case19 对照：同一份快照，有无时点锚定结局不同",
+  "input": {
+    "conclusion": "2024 年 6 月时 foo-lib 的默认超时是 60 秒",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "claim_time": "2024-06-01",
+    "evidence": [
+      {
+        "kind": "official_doc",
+        "detail": "foo-lib 配置参考 2024-06 官方快照（tests/fixtures/docs/api-timeout.md 本地副本）",
+        "as_of": "2024-06-01",
+        "group": "foo-docs",
+        "anchor": "tests/fixtures/docs/api-timeout.md",
+        "quote": "default timeout is 60 seconds"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  },
+  "expected": {
+    "decision": "PASS",
+    "evidence_level": "L2"
+  }
+}

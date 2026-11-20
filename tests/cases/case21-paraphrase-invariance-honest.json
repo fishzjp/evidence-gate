@@ -1,0 +1,56 @@
+{
+  "case": 21,
+  "name": "paraphrase-invariance-honest",
+  "scenario": "P0-4 改写不变性（另一半，防误伤）：诚实异构交叉验证的同义改写必须保持 PASS（b14 家族语料 p11 的结论改写）。改写检查是双向的——攻击改写不掉级别，诚实改写也不升不降",
+  "input": {
+    "conclusion": "foo-lib 3.2 的连接池泄漏问题确实存在，且已经由不同来源独立核实确认",
+    "type": "EXPERIMENT_RESULT",
+    "claimed_strength": "cross_verified",
+    "risk_tier": "high",
+    "generator": "glm-5.3",
+    "evidence": [
+      {
+        "kind": "test_result",
+        "detail": "本地复现脚本泄漏计数上升 run#771",
+        "group": "local-run"
+      },
+      {
+        "kind": "official_doc",
+        "detail": "foo-lib 配置参考（tests/fixtures/docs/api-timeout.md）中 timeouts 章节列出连接池上限语义",
+        "group": "foo-docs",
+        "anchor": "tests/fixtures/docs/api-timeout.md",
+        "quote": "retries | 2 | 重试次数"
+      },
+      {
+        "kind": "official_doc",
+        "detail": "https://gitlab.com/foo-lib/issues/991 issue 报告泄漏",
+        "content_supports": "supported",
+        "group": "issue"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "本地脚本复现泄漏",
+      "env_independent": true,
+      "validates_target": true
+    },
+    "independent_checks": [
+      {
+        "by": "claude-sonnet-4.5",
+        "channel": "retrieval_fresh",
+        "agree": true,
+        "context": "isolated",
+        "detail": "隔离会话中独立检索 issue #991 与上游 commit，确认泄漏存在"
+      }
+    ],
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  },
+  "expected": {
+    "decision": "PASS",
+    "evidence_level": "L4",
+    "output_equals": { "independent_lines": 3 }
+  }
+}

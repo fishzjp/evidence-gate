@@ -12,7 +12,7 @@ classify evidence items so the derivation is honest.
 | L1 | Indirect evidence | Log symptoms, time correlation, small samples, second-hand observation | 可能/初步判断 (possibly / preliminary) |
 | L2 | Direct evidence | Official docs, source code, config, data, logs, test artifacts — each with a trace anchor **whose content was actually checked against the claim** (quote verified, or content attested) | 根据现有证据可以判断 (judged from evidence) |
 | L3 | Experimental verification | You executed something and observed the result: ran code, started the container, called the API, ran the benchmark/test | 已通过实际验证 (verified) |
-| L4 | Independent cross validation | ≥2 independent evidence lines (different tool/method/environment) agree, **and** the counter-evidence search ran isolated (falsifiers derived before re-examining the support) | 已交叉验证 (cross-verified) |
+| L4 | Independent cross validation | ≥2 independent evidence lines (different tool/method/environment) agree **after same-origin collapse**, at least one hard channel among them (quote-checked line, tool-verified line, or a valid agreeing cross-family check). Isolated counter-search and cross-family verification are *decision* requirements on strong claims (see decision-rules.md), not part of the level arithmetic | 已交叉验证 (cross-verified) |
 
 ## Classification guide per evidence kind
 
@@ -41,22 +41,45 @@ classify evidence items so the derivation is honest.
   assumptions unlisted are where reports go to die.
 - `anecdote` — one-off stories, "worked on my machine".
 
-## How the script derives the level
+## How the script derives the level (v3)
 
 ```
 L = max over:
   1  any indirect item
   2  any direct item WITH trace anchor  (downgraded to 1 if the anchor's
      content fails the check: quote not in file / anchor missing /
-     content attested as unsupported)
+     content attested as unsupported / figure not carried by any quote /
+     temporally invalid for this claim)
   3  valid execution  (executed AND env_independent AND validates_target)
-  4  ≥2 distinct direct groups  (only claimable with isolated counter-search)
+  4  ≥2 independent lines AFTER CORRELATION COLLAPSE, with a hard channel
+     (mechanically verified line, tool-verified line, OR valid agreeing
+     cross-family check); ≥2 attested-only lines cap at 3
+     (ATTESTED_ONLY_LINES)
 ```
 
-Groups = independence lines. Two entries from the same run, same tool, or
-same repo belong in ONE group. `docs + source + own-run` is 3 groups → L4.
-`doc A + doc A's tutorial` is 1 group. When unsure whether two sources are
-independent, ask: *if source 1 were wrong, would source 2 still stand?*
+A wrong verification CHANNEL (reasoning about a machine-checkable claim
+class) does not lower the level — it voids the execution and REJECTs the
+verified wording outright (CHANNEL_MISMATCH → FAKE_VERIFICATION, see
+decision-rules.md).
+
+**Correlation collapse (v3):** lines merge when they share a declared
+`group`, a registrable URL domain (unless both attest
+`same_host_independent`), a near-identical quote (token Jaccard ≥ 0.7), or
+a citation chain (one cites the other's anchor URL in its quote or detail
+text). `independent_lines` in the output is the post-collapse count — 100
+reposts of one wire story are 1 line. Aggregator-tier sources support a
+scoped L2 claim but never form an independent line. When unsure whether two
+sources are independent, ask: *if source 1 were wrong, would source 2
+still stand?*
+
+**Temporal validity (v3):** evidence carries `as_of` (and optionally
+`until`). A recency-marked claim ("当前/最新…") on evidence older than
+`freshness_days` (default 365) is demoted to indirect; evidence expired
+before the claim date, or dated in the future, is likewise demoted to
+indirect; a historical claim resting on evidence dated long after its
+`claim_time` is flagged anachronistic. Historical claims with `claim_time`
+are judged against period evidence — old is not wrong, but it is not
+current either.
 
 **Why the anchor content check exists:** field research on agent citations
 found roughly half of real, resolvable citations do not actually support the
@@ -65,11 +88,23 @@ source exists; only reading it proves it helps you. A direct item whose
 content was never opened (no quote, no attestation) counts as unresolved for
 strong claims.
 
-**Why L4 requires isolated counter-search:** same-context counter-search —
+**Why figures must be carried by quotes (v3):** a subtler variant — the
+quote is real, the anchor resolves, but the conclusion's number (30s) is not
+the quote's number (60s). Existence ≠ support; the numbers on the page are
+what the page actually says.
+
+**Why strong claims require isolated counter-search (decision rule):** same-context counter-search —
 looking for disproof while the conclusion sits in your context — is
 measurably worse at surfacing counter-evidence, and agreement bias survives
 extra compute (SGV, ICLR 2026). `cross_verified` is only claimable after
 deriving falsifiers fresh, then searching.
+
+**Why L4 requires a hard channel and heterogeneity (v3):** agreement
+between LLMs is largely shared-prior agreement — same-family models repeat
+each other's errors ~60% of the time, and adding more same-family judges
+buys almost no independent signal (9 judges ≈ 2 effective votes,
+arXiv:2605.29800). L4 therefore needs at least one line that a deterministic
+process (quote check, tool, cross-family check) actually touched.
 
 ## Wording discipline
 
@@ -96,4 +131,10 @@ as overclaiming. The gate blocks overclaiming, not judgment.
 | Docs say X; I also believe X | 2 sources, L4 | 1 source — belief is not a second line |
 | Link exists and loads | content checked | existence ≠ support — quote the supporting line or attest content |
 | Found a second source that copied the first | 2 groups, L4 | 1 group — independence asks: if source 1 were wrong, would source 2 still stand? |
+| Two articles, same news site, "confirming" each other | 2 independent lines, L4 | 1 line after host collapse — syndication is not independence (attest `same_host_independent` only if genuinely distinct origins) |
+| The quote is real but its number differs from the conclusion's | supported, L2+ | quoted lines demoted — the citation must carry the claimed figure (MISLEADING_QUOTE) |
+| 2024 snapshot supporting "当前版本…" | L2 for a current claim | stale for recency-marked claims — re-fetch, or scope the claim with `claim_time` to the snapshot's period |
+| Every URL "supports" but nothing was ever fetched | L4 cross-verified | attested-only caps at L3 — "there is evidence" ≠ "the evidence was examined" |
+| The generator model re-checked its own conclusion | independent check | same-family check ≠ independent — cross-family model or deterministic tool |
+| Read the code carefully, concluded "verified" | L3 | prose about machine-checkable claims is L2 — run the test (CHANNEL_MISMATCH) |
 | Counters searched in the same context that holds the conclusion | isolated search | `same` context → no L4, no cross_verified |

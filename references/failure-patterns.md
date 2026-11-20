@@ -1,8 +1,9 @@
 # Failure Patterns — fake verification & one-sided evidence
 
-The classic fake-verification patterns, how to detect each while filling
-the gate input, and the countermeasure. These matter because they *look*
-like verification — that's what makes them dangerous.
+The classic fake-verification patterns (1–6) and the v3 attack classes
+(7–11) that defeated the v2 gate in A/B testing, how to detect each while
+filling the gate input, and the countermeasure. These matter because they
+*look* like verification — that's what makes them dangerous.
 
 ## Pattern 1 — Reasoning as verification
 
@@ -119,15 +120,121 @@ the same artifact's failure cases; check a different version/environment;
 check edge inputs (empty/zero/max/unicode); ask "what would I see if I were
 wrong, and did I look there?"
 
+## Pattern 7 — Misleading quote (figures the citation doesn't carry) — v3
+
+**Shape:** the anchor resolves, the quote is verbatim in the file — and the
+conclusion claims 30s while every quote says 60s. The citation is real; the
+support is fictional. This is the anchor-entailment gap's sharp edge:
+numbers are where "supports" becomes checkable.
+
+**Detection:** mechanical, in the script: if the conclusion claims 1–3
+unit-bearing figures (FACT/INFERENCE/EXPERIMENT_RESULT), no valid execution
+exists, and NONE of the figures is carried by any quote, anchor text, or
+evidence detail (exact match after normalizing thousand separators /
+trailing zeros / full-width digits, with time-unit conversion — "0.5 分钟"
+is carried by "30 seconds"), all quoted lines demote to indirect
+(MISLEADING_QUOTE). Deliberately narrow — version numbers ("foo-lib 3.2")
+and conditional thresholds ("若需低于 200ms") don't count as claimed
+quantities; the wide rule over-blocked 5/10 honest conclusions in
+prototyping, the narrow one holds FRR at 0.
+
+**Countermeasure:** quote the line that contains YOUR number, or fix the
+number in the conclusion. If the doc really does support the figure, the
+line is quotable — if you can't quote it, the doc doesn't say it.
+
+## Pattern 8 — Correlated "independent" evidence (syndication) — v3
+
+**Shape:** "two independent reports confirm…" — two articles on the same
+news host, near-identical text, one wire story reposted. Independence is
+asserted by counting sources; it evaporates under provenance. 100 reposts
+of one wire story are 1 source with 100 URLs.
+
+**Detection:** mechanical collapse in the script: shared declared group,
+shared registrable URL domain (unless both attest `same_host_independent`),
+quote token Jaccard ≥ 0.7, or a citation chain (one item's quote OR detail
+text cites another's anchor URL) merge into one independent line
+(CORRELATED_EVIDENCE); `independent_lines` is post-collapse. Aggregator-tier
+sources never form independent lines at all.
+
+**Countermeasure:** for L4, find lines with different failure modes —
+different origin organization, different method (static vs dynamic), or a
+deterministic tool. Ask of each pair: if source 1 were wrong, would source 2
+still stand? If they'd fall together, they're one line.
+
+## Pattern 9 — Stale evidence for current claims — v3
+
+**Shape:** "当前版本的默认超时是 60s", cited to a doc snapshot from two years
+ago. The claim is about *now*; the evidence is about *then*. Correct then ≠
+correct now.
+
+**Detection:** `as_of` on every source; the script demotes evidence older
+than `freshness_days` (default 365) under a recency-marked claim
+(TEMPORAL_STALE), evidence expired before the claim date
+(TEMPORAL_SUPERSEDED), evidence dated in the future
+(FUTURE_DATED_EVIDENCE), and flags historical claims resting on evidence
+dated long after their `claim_time` (TEMPORAL_ANACHRONISTIC). Historical
+claims with `claim_time` are judged against period evidence — the same
+snapshot that fails "当前" passes "2024 年 6 月时".
+
+**Countermeasure:** date your evidence (`as_of`), scope your claim
+(`claim_time`), and re-fetch when claiming currency. Old evidence isn't
+wrong — it's evidence about a different time.
+
+## Pattern 10 — Same-model "independent" check — v3
+
+**Shape:** the agent "verified" its conclusion by asking itself — or a
+sibling model of the same family — and reporting agreement as
+cross-validation. Same-family models share priors and errors: ~60% same-
+error agreement in ICML 2025 measurements, and stacking more same-family
+judges buys almost nothing (9 judges ≈ 2 effective votes,
+arXiv:2605.29800). Agreement between correlated verifiers is an echo, not a
+confirmation.
+
+**Detection:** `generator` vs each `independent_checks[].by` family:
+same-family checks are flagged (SAME_MODEL_VERIFIER) and do not satisfy
+cross-family verification; a check whose family cannot be read from its
+identifier doesn't count either (VERIFIER_IDENTITY_UNKNOWN — self-reported
+identity is not corroboration); a DISagreeing isolated check blocks from
+any family (INDEPENDENT_DISAGREEMENT). L4 additionally needs a hard
+channel — a quote-checked line, a tool-verified line
+(`verified_by: "tool:NAME"`, name required), or an agreeing cross-family
+check in isolated context.
+
+**Countermeasure:** verify with a different family, or better, a
+deterministic tool — tools share no LLM prior at all. Agreement routes,
+never decides: cross-family disagreement blocks; agreement only releases.
+
+## Pattern 11 — Channel mismatch & attested-only L4 — v3
+
+**Shape (a):** "verified" reached by reading and reasoning about
+machine-checkable behavior (code/config/data/math). Prose is not execution.
+**Shape (b):** every URL attested "supports", nothing ever fetched, and the
+conclusion ships as cross-verified — attestation all the way down.
+
+**Detection:** `claim_class` in {code_behavior, config, data, math} claimed
+at `verified`+ requires `verification.channel` in {execution, test,
+assertion, formal_proof, statistical} — otherwise FAKE_VERIFICATION →
+REJECT (CHANNEL_MISMATCH). ≥2 lines with no mechanical check among them cap
+at L3 (ATTESTED_ONLY_LINES): "there is evidence" ≠ "the evidence was
+examined".
+
+**Countermeasure:** route the claim to a machine channel — run the test,
+execute the command, assert the property, prove the theorem. What a machine
+can decide must not be settled by eloquence; and for cross-verified
+wording, at least one line must have been touched by something
+deterministic.
+
 ## Why agents rationalize these (and why the gate doesn't care)
 
 Under deadline/authority/sunk-cost pressure, each pattern has a soothing
 story: "the diff is obviously correct", "green means green", "the harness
-built it, not my problem", "the sample was random", "I cited my sources".
+built it, not my problem", "the sample was random", "I cited my sources",
+"two outlets reported it", "the model double-checked itself".
 The gate's answer to all of them is structural: those stories live in
 *fields* (`executed`, `validates_target`, `env_independent`,
-`statistical_basis`, `quote`, `content_supports`, `counter_search_context`)
-that you must fill before the decision is computed — the quote and
-absolute-wording checks run mechanically on artifacts, not on your word —
-and the fill happens while you are calm, not while you are rushing the last
-paragraph of the report.
+`statistical_basis`, `quote`, `content_supports`, `counter_search_context`,
+`as_of`, `generator`, `claim_class`, `verification.channel`, `verified_by`)
+that you must fill before the decision is computed — the quote, figure,
+collapse, temporal, channel and family checks run mechanically on
+artifacts, not on your word — and the fill happens while you are calm, not
+while you are rushing the last paragraph of the report.

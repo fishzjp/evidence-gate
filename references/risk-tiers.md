@@ -13,6 +13,38 @@ for cheap mistakes, real verification for expensive ones.
 | high | wrong claim causes bad decisions, rework, or false assurance | gate + active counter-evidence hunt + actual verification for any claim ≥ judged |
 | extreme | wrong claim is contractual/production/security-critical, or hard to reverse | everything + independent second line (L4) for strong claims |
 
+## The verification cost ladder (v3)
+
+Risk buys verification depth — and depth is spent on the *right channel*,
+not on more of the same channel. The ladder (risk-based routing, per
+FIRE/ABC cascades: escalate only when the cheap rung fails to settle it):
+
+| Rung | Cost | What runs | When (tier × claim) |
+|------|------|-----------|---------------------|
+| 1. Cheap check | ~free | wording-table / level arithmetic; anchor+quote mechanical check | low tier, any claim; every tier's first pass |
+| 2. Evidence check | one command | resolve the anchor, read the content, quote the supporting line; figure consistency; temporal validity | medium tier; rung-1 leftovers |
+| 3. Actual verification | minutes | execute it: run the test/benchmark/command in a clean env; `--gate-point pre-action` for irreversible actions | high tier ≥ judged; any works/causal claim; EXPERIMENT_RESULT |
+| 4. Independent verification | one extra session | isolated counter-search + cross-family model check or deterministic tool re-derivation | high/extreme ≥ verified; extreme ≥ judged |
+| 5. Multi-model / external / formal | budget | ≥2 cross-family verifiers with aggregation rules; external oracle (CI, authority, spec); formal proof for decidable classes | extreme ≥ verified; any formalizable high-stakes claim |
+
+Rung 5 rules: agreement routes, never decides — cross-family disagreement
+blocks; agreement only releases. For finite populations prefer census; for
+machine-checkable classes (below) rung 3+ must be mechanical regardless of
+how cheap prose is.
+
+## Claim-class routing (v3: channel must match the claim)
+
+| claim_class | Machine-checkable? | Required channel for `verified`+ |
+|-------------|--------------------|----------------------------------|
+| `code_behavior` / `config` / `data` / `math` | yes | any of `execution` / `test` / `assertion` / `formal_proof` / `statistical` — one uniform set for all four classes |
+| (default / behavioral / reporting) | no | any — language reasoning allowed at its level |
+
+Reasoning/reading is a legitimate channel for non-mechanical claims — but
+for machine-checkable ones it is voided (CHANNEL_MISMATCH → REJECT): what a
+machine can decide must not be settled by eloquence. Set `claim_class` and
+`verification.channel` whenever the conclusion is about code behavior,
+configuration, data, or mathematics.
+
 ## High-risk conclusion topics (never language-reasoning only)
 
 Data quality / dedup judgments · benchmark validity · model consistency /
@@ -30,12 +62,13 @@ The tier above applies to conclusions. The same math applies to *actions*:
 deploy, delete, send, merge, purchase, ticket-close are the moments where a
 wrong claim converts into damage with no take-back. Run the gate with
 `--gate-point pre-action` for the claim embedded in the action ("现在直接
-apply，服务不会中断"). Effects: risk escalates one tier; any works/won't-break
-claim requires actual execution — reading the config is never enough;
-PASS_WITH_CAVEAT degrades to VERIFY_REQUIRED. Abstention research
-(AgentAbstain, 2025) shows this is where agents fail: a model that answers
-59.5% of risky questions it shouldn't touch at all. The irreversible-action
-gate is the mechanism that catches those before the harm, not after.
+apply，服务不会中断"). Effects: low/medium risk is escalated to high
+(high/extreme stay as filed); any works/won't-break claim requires actual
+execution (works_floor drops to `possibly`) — reading the config is never
+enough. Abstention research (AgentAbstain, 2025) shows this is where agents
+fail: a model that answers 59.5% of risky questions it shouldn't touch at
+all. The irreversible-action gate is the mechanism that catches those
+before the harm, not after.
 
 ## Per-tier playbook
 
@@ -52,9 +85,12 @@ recorded. Check version/environment/configuration boundaries explicitly —
 "works on my machine" is L3 for *your* machine only, scope it.
 
 **extreme** — Two independent lines with different failure modes (static
-audit + dynamic run; own tool + independent tool; local + CI). For finite
-populations, prefer census over sample. Write down what would change the
-answer (dependencies, versions) as explicit caveats.
+audit + dynamic run; own tool + independent tool; local + CI), at least one
+mechanically verified, and heterogeneity actually checked: the independent
+line must not be the generator's own family re-reading its own output
+(cross-family model or deterministic tool). For finite populations, prefer
+census over sample. Write down what would change the answer (dependencies,
+versions) as explicit caveats.
 
 ## Anti-overblocking rules (equally binding)
 

@@ -1,0 +1,35 @@
+{
+  "case": 19,
+  "name": "temporal-stale",
+  "scenario": "P0-C 过期证据（v3）：'当前版本'的时效性声明建立在 2024-06 的文档快照上（as_of 距今 >2 年，超 365 天新鲜度窗口）——旧快照证实的是旧事实，不能确认当前状态。注意与 case23 的历史性声明对照：历史断言锚定时点后旧证据是正确的",
+  "input": {
+    "conclusion": "foo-lib 当前版本的默认超时是 60 秒",
+    "type": "FACT",
+    "claimed_strength": "judged",
+    "risk_tier": "medium",
+    "evidence": [
+      {
+        "kind": "official_doc",
+        "detail": "foo-lib 配置参考本地副本（2024-06 快照）",
+        "as_of": "2024-06-01",
+        "group": "foo-docs",
+        "anchor": "tests/fixtures/docs/api-timeout.md",
+        "quote": "default timeout is 60 seconds"
+      }
+    ],
+    "verification": {
+      "executed": false,
+      "detail": "",
+      "env_independent": "unknown",
+      "validates_target": "unknown"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  },
+  "expected": {
+    "decision": "VERIFY_REQUIRED",
+    "reason_contains": ["freshness window"]
+  }
+}

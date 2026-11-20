@@ -1,0 +1,54 @@
+{
+  "case": 17,
+  "name": "same-model-verification",
+  "scenario": "P0-D 伪独立验证（v3）：生成器 glm-5.3 自称的 independent check 也由 glm-5.3 执行——同家族相关失效不是交叉验证（cross-family > same-family > self, arXiv:2512.02304）。高强度+高风险声明应要求真正异构验证",
+  "input": {
+    "conclusion": "数据管道迁移后无重复记录，已交叉验证",
+    "type": "EXPERIMENT_RESULT",
+    "claimed_strength": "cross_verified",
+    "risk_tier": "high",
+    "generator": "glm-5.3",
+    "evidence": [
+      {
+        "kind": "test_result",
+        "detail": "本地去重脚本扫描 run#882：0 重复",
+        "group": "local-run"
+      },
+      {
+        "kind": "official_doc",
+        "detail": "https://gitlab.com/foo-org/migration/-/issues/77 迁移验证记录",
+        "content_supports": "supported",
+        "group": "issue"
+      },
+      {
+        "kind": "data",
+        "detail": "https://stack.example.com/datasets/migration-audit 审计数据副本",
+        "content_supports": "supported",
+        "group": "audit-copy"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "本地去重脚本执行",
+      "env_independent": true,
+      "validates_target": true
+    },
+    "independent_checks": [
+      {
+        "by": "glm-5.3",
+        "channel": "reasoning",
+        "agree": true,
+        "context": "isolated",
+        "detail": "由 glm-5.3 复查脚本与结论，一致"
+      }
+    ],
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  },
+  "expected": {
+    "decision": "VERIFY_REQUIRED",
+    "reason_contains": ["correlated failure, not cross-validation"]
+  }
+}

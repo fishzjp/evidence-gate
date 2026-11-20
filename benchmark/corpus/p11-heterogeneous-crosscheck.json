@@ -1,0 +1,54 @@
+{
+  "id": "p11",
+  "name": "heterogeneous-crosscheck-pass",
+  "expectation": "should_pass",
+  "suite": "adversarial",
+  "args": [],
+  "scenario": "正例（v3 反误伤）：真正的异构交叉验证——本地机械引文线 + 不同宿主证据线 + 跨家族独立核查（claude vs 生成器 glm）→ 应放行 L4。验证 P0-D 规则不会误伤诚实申报",
+  "input": {
+    "conclusion": "foo-lib 3.2 存在连接池泄漏，已交叉验证",
+    "type": "EXPERIMENT_RESULT",
+    "claimed_strength": "cross_verified",
+    "risk_tier": "high",
+    "generator": "glm-5.3",
+    "evidence": [
+      {
+        "kind": "test_result",
+        "detail": "本地复现脚本泄漏计数上升 run#771",
+        "group": "local-run"
+      },
+      {
+        "kind": "official_doc",
+        "detail": "foo-lib 配置参考（tests/fixtures/docs/api-timeout.md）中 timeouts 章节列出连接池上限语义",
+        "group": "foo-docs",
+        "anchor": "tests/fixtures/docs/api-timeout.md",
+        "quote": "retries | 2 | 重试次数"
+      },
+      {
+        "kind": "official_doc",
+        "detail": "https://gitlab.com/foo-lib/issues/991 issue 报告泄漏",
+        "content_supports": "supported",
+        "group": "issue"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "本地脚本复现泄漏",
+      "env_independent": true,
+      "validates_target": true
+    },
+    "independent_checks": [
+      {
+        "by": "claude-sonnet-4.5",
+        "channel": "retrieval_fresh",
+        "agree": true,
+        "context": "isolated",
+        "detail": "隔离会话中独立检索 issue #991 与上游 commit，确认泄漏存在"
+      }
+    ],
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

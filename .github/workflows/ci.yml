@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Compile check
-        run: python3 -m py_compile scripts/gate_check.py tests/run_tests.py benchmark/run_benchmark.py tests/validate_skill.py
+        run: python3 -m py_compile scripts/gate_check.py tests/run_tests.py benchmark/run_benchmark.py benchmark/run_ab.py tests/validate_skill.py
       - name: Skill structure (frontmatter, internal references)
         run: python3 tests/validate_skill.py
 

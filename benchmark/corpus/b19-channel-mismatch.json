@@ -1,0 +1,33 @@
+{
+  "id": "b19",
+  "name": "channel-mismatch-verified",
+  "expectation": "should_block",
+  "suite": "adversarial",
+  "args": [],
+  "scenario": "对抗（v3 新增能力）：通道错配——代码行为类声明（claim_class=code_behavior）的'verified'建立在读代码推理上（channel=reasoning）；v2 只要 executed=true 就给 L3；v3 CHANNEL_MISMATCH：可机器判定的声明不允许语言推理冒充验证（能形式化的交给机器证明）",
+  "input": {
+    "conclusion": "解析器 bug 已修复：new_parse() 对空输入已能正确返回空列表",
+    "type": "EXPERIMENT_RESULT",
+    "claimed_strength": "verified",
+    "risk_tier": "medium",
+    "claim_class": "code_behavior",
+    "evidence": [
+      {
+        "kind": "source_code",
+        "detail": "逐行分析 src/parser.py 的 new_parse()：空输入分支已加 guard，逻辑上会返回空列表",
+        "group": "code-reading"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "仔细阅读了修改后的代码并推演了控制流",
+      "env_independent": true,
+      "validates_target": true,
+      "channel": "reasoning"
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

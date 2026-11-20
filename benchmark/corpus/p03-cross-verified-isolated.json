@@ -20,11 +20,12 @@
       },
       {
         "kind": "data",
-        "detail": "逐层 diff 记录（本地副本）：仅新增 /app 一层",
+        "detail": "逐层 diff 记录（本地副本，由镜像层比对工具产出）：仅新增 /app 一层",
         "anchor": "tests/fixtures/docs/image-diff-2026-11-18.md",
         "quote": "仅新增一层：/app（应用代码）",
         "content_supports": "supported",
-        "group": "local-diff"
+        "group": "local-diff",
+        "verified_by": "tool:docker-layer-diff"
       }
     ],
     "verification": {

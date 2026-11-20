@@ -51,23 +51,26 @@ Final Answer
 
 ```text
 Evidence Gate Result
+
 Conclusion:
+升级到 fastify 5.x 后服务可以正常运行
 Type: INFERENCE
 Claimed strength: likely  (risk: medium)
-Evidence Level: L2  (claim requires L3)
+Evidence Level: L2  (claim requires L3; independent lines: 1)
 Evidence (anchor three-stage check):
   - [direct·mech✓] official_doc — quote verified in anchor: tests/fixtures/fastify-server.md
-  execution: executed=False valid=False env_independent=unknown validates_target=unknown
+  execution: executed=False valid=False env_independent=unknown validates_target=unknown channel=None
 Counter-evidence search context: isolated
 Findings:
-Confidence: LOW
 Decision: VERIFY_REQUIRED  (exit 10)
 Reason:
+  claimed strength 'likely' requires L3, evidence is only L2 (works/viability claim without execution): conclusion strength exceeds evidence strength — execute the actual verification (run it), or downgrade the wording to the allowed strength and rerun the gate
 Allowed wording: 可能/初步判断 (possibly / preliminary) — 未实际运行验证 (not actually executed/verified)
+Calibration: levels are ordinal, not probabilities; empirical per-level accuracy via --calibration
 Required actions:
   - execute the actual verification: run the program / tests / benchmark instead of reasoning about it
   - or downgrade the wording and rerun the gate with the lower claim
-Verifier: {"id": "unspecified", "protocol": "gate_check/2.0.0", "entailment_channel": "mechanical"}
+Verifier: {"id": "unspecified", "protocol": "gate_check/3.0.0", "entailment_channel": "mechanical", "independent_checks": {"valid_agreeing": 0, "cross_family_required": false, "cross_family_ok": null}}
 ```
 
 Agent 服从决策：不输出原句，执行验证动作。
@@ -107,20 +110,23 @@ Agent 服从决策：不输出原句，执行验证动作。
 
 ```text
 Evidence Gate Result
+
 Conclusion:
+升级到 fastify 5.x 后服务可以正常运行
 Type: INFERENCE
 Claimed strength: verified  (risk: medium)
-Evidence Level: L3  (claim requires L3)
+Evidence Level: L3  (claim requires L3; independent lines: 1)
 Evidence (anchor three-stage check):
   - [direct·mech✓] official_doc — quote verified in anchor: tests/fixtures/fastify-server.md
-  execution: executed=True valid=True env_independent=True validates_target=True
+  execution: executed=True valid=True env_independent=True validates_target=True channel=None
 Counter-evidence search context: isolated
 Findings:
-Confidence: HIGH
 Decision: PASS  (exit 0)
 Reason:
+  evidence L3 supports claimed strength 'verified' (requires L3)
 Allowed wording: 已通过实际验证 (verified)
-Verifier: {"id": "unspecified", "protocol": "gate_check/2.0.0", "entailment_channel": "mechanical"}
+Calibration: levels are ordinal, not probabilities; empirical per-level accuracy via --calibration
+Verifier: {"id": "unspecified", "protocol": "gate_check/3.0.0", "entailment_channel": "mechanical", "independent_checks": {"valid_agreeing": 0, "cross_family_required": false, "cross_family_ok": null}}
 ```
 
 ## 最终回答

@@ -1,0 +1,43 @@
+{
+  "id": "b18",
+  "name": "attested-only-cross-verified",
+  "expectation": "should_block",
+  "suite": "adversarial",
+  "args": [],
+  "scenario": "对抗（v3 新增能力）：过度自信——'已交叉验证'完全建立在从未抓取核对的 URL 自我申报上（attested-only），且无任何异构独立核查；v2 授予 L4/HIGH confidence；v3 attested-only L4 上限应拦截",
+  "input": {
+    "conclusion": "foo-lib 3.2 存在连接池泄漏，已交叉验证",
+    "type": "EXPERIMENT_RESULT",
+    "claimed_strength": "cross_verified",
+    "risk_tier": "high",
+    "evidence": [
+      {
+        "kind": "test_result",
+        "detail": "本地复现脚本泄漏计数上升 run#771",
+        "group": "local-run"
+      },
+      {
+        "kind": "official_doc",
+        "detail": "https://gitlab.com/foo-lib/issues/991 issue 报告泄漏",
+        "content_supports": "supported",
+        "group": "issue"
+      },
+      {
+        "kind": "official_doc",
+        "detail": "https://stackoverflow.com/q/foo-lib-leak 讨论确认",
+        "content_supports": "supported",
+        "group": "so"
+      }
+    ],
+    "verification": {
+      "executed": true,
+      "detail": "本地脚本复现泄漏",
+      "env_independent": true,
+      "validates_target": true
+    },
+    "counter_evidence": [],
+    "counter_search_context": "isolated",
+    "evidence_obtainable": "yes",
+    "generalization": null
+  }
+}

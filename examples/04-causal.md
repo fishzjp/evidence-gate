@@ -37,25 +37,29 @@
 
 ```text
 Evidence Gate Result
+
 Conclusion:
+客户端 v2.1.0 上线后错误率上升，说明 v2.1.0 导致了错误率上升
 Type: INFERENCE
 Claimed strength: judged  (risk: medium)
-Evidence Level: L1  (claim requires L3)
+Evidence Level: L1  (claim requires L3; independent lines: 0)
 Evidence (anchor three-stage check):
   - [indirect] time_correlation — 错误率监控（grafana /d/err）：v2.1.0 发布（14:00）后 5 分钟错误率从 0.1% 升至 2%
   - [indirect] memory — 发布窗口内应该没有其他变更（听值班同学说的）
-  execution: executed=False valid=False env_independent=unknown validates_target=unknown
+  execution: executed=False valid=False env_independent=unknown validates_target=unknown channel=None
 Counter-evidence search context: same
 Findings:
-Confidence: LOW
+  [info] NON_EVIDENCE_KIND: evidence kind 'memory' is not evidence, only a prior (L0/L1 at most)
 Decision: VERIFY_REQUIRED  (exit 10)
 Reason:
+  claimed strength 'judged' requires L3, evidence is only L1 (causal claim asserted from correlation-level evidence): conclusion strength exceeds evidence strength — execute the actual verification (run it), or downgrade the wording to the allowed strength and rerun the gate
 Allowed wording: 可能/初步判断 (possibly / preliminary) — 未实际运行验证 (not actually executed/verified)
+Calibration: levels are ordinal, not probabilities; empirical per-level accuracy via --calibration
 Mandatory caveats (must appear in output):
   - counter-evidence search was same-context; coverage may be limited by agreement bias
 Required actions:
   - execute the actual verification: run the program / tests / benchmark instead of reasoning about it
-Verifier: {"id": "unspecified", "protocol": "gate_check/2.0.0", "entailment_channel": "none"}
+Verifier: {"id": "unspecified", "protocol": "gate_check/3.0.0", "entailment_channel": "none", "independent_checks": {"valid_agreeing": 0, "cross_family_required": false, "cross_family_ok": null}}
 ```
 
 ## 服从决策后应这样表述
