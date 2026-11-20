@@ -1,6 +1,7 @@
 # Evidence Gate
 
 [![CI](https://github.com/fishzjp/evidence-gate/actions/workflows/ci.yml/badge.svg)](https://github.com/fishzjp/evidence-gate/actions/workflows/ci.yml)
+[![Skills](https://skills.sh/b/fishzjp/evidence-gate)](https://www.skills.sh/fishzjp/evidence-gate/evidence-gate)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Dependencies](https://img.shields.io/badge/dependencies-0-green.svg)](#安装)
@@ -10,24 +11,16 @@
 > conclusion ships. v3 adds independence collapse, heterogeneous
 > verification, temporal validity, and quote-figure consistency.
 
-Evidence Gate 是一个面向 AI Agent 的结论质量闸门（Agent Skill）。它工作在
-结论出口处：当 Agent 即将输出一条重要结论时，先核对这条结论背后的证据，
-再决定它允许以什么强度的措辞说出口。整个项目只坚持一条原则——
-**结论强度不得超过证据强度**。
+**结论强度不得超过证据强度**——整个项目只坚持这一条原则。Evidence Gate
+是一个面向 AI Agent 的结论质量闸门（Agent Skill），工作在结论出口处：当
+Agent 即将输出一条重要结论时，先核对这条结论背后的证据，再决定它允许以
+什么强度的措辞说出口。
 
-它不靠提示词里的"请认真检查"起作用，而是把要求落成可执行的机制。Agent
-为每条关键结论填写一份结构化证据清单；判定脚本 `gate_check.py` 对清单做
+它不靠提示词里的"请认真检查"起作用，而是把要求落成可执行的机制：Agent
+为每条关键结论填写一份结构化证据清单，判定脚本 `gate_check.py` 对清单做
 机械核查，输出五类决策之一，并给出允许的措辞上限。脚本是纯 Python 标准库
-实现，没有第三方依赖，单次运行约 70 毫秒。每次运行都会写入审计日志，
-事后可以回标结论的对错，从而统计各个证据等级的真实准确率。
-
-v3.0.0（"Evidence Gate 2.0"）是一次可靠性专项升级：不是把门槛抬高，而是
-补上 v2 没有问的四个问题——**谁验证的**（同模型自检是相关失效，不算交叉
-验证）、**验证的是哪条线**（100 家转载 = 1 条独立线）、**什么时候的证据**
-（2024 年的快照撑不起"当前版本"）、**证据里的数字和结论里的是否同一个**
-（引文真实存在 ≠ 引文支持结论）。A/B 实测：6 类针对性攻击在 v2 上全部
-穿透（FAR 100%），v3 全部拦截且诚实正例零误伤，旧语料完全向后兼容
-（`python3 benchmark/run_ab.py` 可复现）。
+实现，没有第三方依赖，单次运行约 70 毫秒；每次运行都会写入审计日志，事后
+可以回标结论的对错，从而统计各个证据等级的真实准确率。
 
 > Evidence Gate 是验证与质量控制机制，不是正确性证明器。它能降低
 > "未经验证的错误结论流入最终输出"的风险，但不能保证结论一定正确。
@@ -56,10 +49,10 @@ v3.0.0（"Evidence Gate 2.0"）是一次可靠性专项升级：不是把门槛�
 
 ## 目录
 
-- [为什么需要 Evidence Gate](#为什么需要-evidence-gate)
-- [核心机制](#核心机制)
 - [安装](#安装)
 - [快速开始](#快速开始)
+- [为什么需要 Evidence Gate](#为什么需要-evidence-gate)
+- [核心机制](#核心机制)
 - [示例](#示例)
 - [CLI 速查](#cli-速查)
 - [Benchmark](#benchmark)
@@ -68,6 +61,105 @@ v3.0.0（"Evidence Gate 2.0"）是一次可靠性专项升级：不是把门槛�
 - [架构与仓库结构](#架构与仓库结构)
 - [参与贡献](#参与贡献)
 - [License](#license)
+
+## 安装
+
+运行只依赖 Python 3.10+，全部使用标准库，零第三方依赖。CI 在 3.10–3.13
+矩阵上验证。
+
+**方式一：skills CLI 一键安装（推荐）。** 本仓库已收录进开放 Agent skills
+生态，一条命令即可安装到 Claude Code、Cursor、Codex、GitHub Copilot 等
+35 个 Agent 运行时（19 个通用路径 + 16 个符号链接适配，以实际安装输出
+为准）：
+
+```bash
+npx skills add fishzjp/evidence-gate
+```
+
+安装后可用 `npx skills update` 统一升级，`npx skills check` 检查更新。
+
+**方式二：Claude Code 插件安装。** 仓库自带 plugin marketplace 清单
+（`.claude-plugin/`），在 Claude Code 会话里执行：
+
+```text
+/plugin marketplace add fishzjp/evidence-gate
+/plugin install evidence-gate@evidence-gate
+```
+
+**方式三：手动克隆。** 本仓库本身就是一个 skill，[SKILL.md](SKILL.md)
+位于仓库根目录，克隆或复制到你的 Agent 运行时技能目录即可：
+
+```bash
+# 通用路径示例：
+git clone https://github.com/fishzjp/evidence-gate.git ~/.agents/skills/evidence-gate
+# Claude Code 使用：~/.claude/skills/evidence-gate
+# 项目级安装：      <project>/.agents/skills/evidence-gate
+```
+
+安装后，Agent 会按 SKILL.md 里的触发条件自动使用它。如果运行时不支持
+skill 机制，也可以把 SKILL.md 的内容贴进系统提示词：流程指引仍然有效，
+只是失去了脚本的机械核查能力。
+
+**作为独立命令行工具使用。** 不需要任何 agent 框架：
+
+```bash
+git clone https://github.com/fishzjp/evidence-gate.git && cd evidence-gate
+python3 scripts/gate_check.py --help
+```
+
+## 快速开始
+
+一分钟完成第一次判定。先创建 `gate-input.json`。下面的例子引用的是仓库
+内的真实文件，可以直接复现：
+
+```json
+{
+  "conclusion": "foo-lib 的默认请求超时是 60 秒",
+  "type": "FACT",
+  "claimed_strength": "judged",
+  "risk_tier": "medium",
+  "evidence": [
+    {"kind": "official_doc", "detail": "foo-lib 配置参考：timeout 默认 60 秒",
+     "anchor": "tests/fixtures/docs/api-timeout.md",
+     "quote": "default timeout is 60 seconds", "content_supports": "supported",
+     "group": "docs"}
+  ],
+  "verification": {"executed": false, "detail": "",
+                   "env_independent": "unknown", "validates_target": "unknown"},
+  "counter_evidence": [
+    {"detail": "旧版本 v1.x 默认 30 秒；已核对锁文件确认项目固定 v2.3.1",
+     "status": "refuted", "contradicts": true}
+  ],
+  "counter_search_context": "isolated",
+  "evidence_obtainable": "yes",
+  "generalization": null
+}
+```
+
+然后运行：
+
+```bash
+python3 scripts/gate_check.py gate-input.json
+```
+
+输出如下（真实输出的节选）：
+
+```text
+Evidence Level: L2  (claim requires L2; independent lines: 1)
+Evidence (anchor three-stage check):
+  - [direct·mech✓] official_doc — quote verified in anchor: tests/fixtures/docs/api-timeout.md
+Decision: PASS  (exit 0)
+Allowed wording: 根据现有证据可以判断 (judged from evidence)
+```
+
+这个例子能通过，是因为三个条件都成立：引文机械核验通过（那行字确实在
+文件里）、反证被核实排除（锁文件确认了版本）、声明强度与证据等级匹配。
+
+不妨亲手试两个变体：把引文改成 `"default timeout is 30 seconds"` 再运行
+同一命令，会得到 `ANCHOR_QUOTE_MISSING`，证据被降级，决策变为
+`VERIFY_REQUIRED (exit 10)`。或者保持引文不变、把结论改成"默认请求超时
+是 30 秒"——引文真实存在，但结论的数字不在任何引文里，v3 的
+`MISLEADING_QUOTE` 照样拦截。这就是"引用存在不等于引用支持"的机械执行。
 
 ## 为什么需要 Evidence Gate？
 
@@ -82,7 +174,12 @@ Agent 输出关键结论时有五类高频失效。危险之处在于，这五�
 | 相关冒充因果 | 发布后错误率上升，于是说"新版本导致的" | 时间相关只是间接证据 |
 | 引用冒充支持 | 附上一个真实链接 | 实测约半数真实引用并不支持其结论 |
 
-v3 又补上五类更隐蔽的（v2 全部放行、v3 全部拦截，均有 A/B 实证）：
+v3.0.0 不是把门槛抬高，而是补上 v2 没有问的四个问题——**谁验证的**（同模型
+自检是相关失效，不算交叉验证）、**验证的是哪条线**（100 家转载 = 1 条独立
+线）、**什么时候的证据**（2024 年的快照撑不起"当前版本"）、**证据里的数字
+和结论里的是否同一个**（引文真实存在 ≠ 引文支持结论）——由此识别出五类更
+隐蔽的失效（v2 全部放行、v3 全部拦截，A/B 实测可用 `python3
+benchmark/run_ab.py` 复现）：
 
 | 失效（v3 新增识别） | 样子 | 实质 |
 |--------------------|------|------|
@@ -199,105 +296,6 @@ v2 的四个机制之上，v3 新增五个（每条都有防误伤正例）：
   区间、单调性检查、风险-覆盖曲线、弃权 P/R、错误归因），`--emit-overrides`
   可把校准结果变成强制措辞上限。v3 移除了启发式 confidence 字段——
   规则推出来的"信心"本身就是未验证的声明；等级是序数，校准只来自测量。
-
-## 安装
-
-运行只依赖 Python 3.10+，全部使用标准库，零第三方依赖。CI 在 3.10–3.13
-矩阵上验证。
-
-**方式一：skills CLI 一键安装（推荐）。** 本仓库已收录进开放 Agent skills
-生态，一条命令即可安装到 Claude Code、Cursor、Codex、GitHub Copilot 等
-35 个 Agent 运行时（19 个通用路径 + 16 个符号链接适配，以实际安装输出
-为准）：
-
-```bash
-npx skills add fishzjp/evidence-gate
-```
-
-安装后可用 `npx skills update` 统一升级，`npx skills check` 检查更新。
-
-**方式二：Claude Code 插件安装。** 仓库自带 plugin marketplace 清单
-（`.claude-plugin/`），在 Claude Code 会话里执行：
-
-```text
-/plugin marketplace add fishzjp/evidence-gate
-/plugin install evidence-gate@evidence-gate
-```
-
-**方式三：手动克隆。** 本仓库本身就是一个 skill，[SKILL.md](SKILL.md)
-位于仓库根目录，克隆或复制到你的 Agent 运行时技能目录即可：
-
-```bash
-# 通用路径示例：
-git clone https://github.com/fishzjp/evidence-gate.git ~/.agents/skills/evidence-gate
-# Claude Code 使用：~/.claude/skills/evidence-gate
-# 项目级安装：      <project>/.agents/skills/evidence-gate
-```
-
-安装后，Agent 会按 SKILL.md 里的触发条件自动使用它。如果运行时不支持
-skill 机制，也可以把 SKILL.md 的内容贴进系统提示词：流程指引仍然有效，
-只是失去了脚本的机械核查能力。
-
-**作为独立命令行工具使用。** 不需要任何 agent 框架：
-
-```bash
-git clone https://github.com/fishzjp/evidence-gate.git && cd evidence-gate
-python3 scripts/gate_check.py --help
-```
-
-## 快速开始
-
-一分钟完成第一次判定。先创建 `gate-input.json`。下面的例子引用的是仓库
-内的真实文件，可以直接复现：
-
-```json
-{
-  "conclusion": "foo-lib 的默认请求超时是 60 秒",
-  "type": "FACT",
-  "claimed_strength": "judged",
-  "risk_tier": "medium",
-  "evidence": [
-    {"kind": "official_doc", "detail": "foo-lib 配置参考：timeout 默认 60 秒",
-     "anchor": "tests/fixtures/docs/api-timeout.md",
-     "quote": "default timeout is 60 seconds", "content_supports": "supported",
-     "group": "docs"}
-  ],
-  "verification": {"executed": false, "detail": "",
-                   "env_independent": "unknown", "validates_target": "unknown"},
-  "counter_evidence": [
-    {"detail": "旧版本 v1.x 默认 30 秒；已核对锁文件确认项目固定 v2.3.1",
-     "status": "refuted", "contradicts": true}
-  ],
-  "counter_search_context": "isolated",
-  "evidence_obtainable": "yes",
-  "generalization": null
-}
-```
-
-然后运行：
-
-```bash
-python3 scripts/gate_check.py gate-input.json
-```
-
-输出如下（真实输出的节选）：
-
-```text
-Evidence Level: L2  (claim requires L2; independent lines: 1)
-Evidence (anchor three-stage check):
-  - [direct·mech✓] official_doc — quote verified in anchor: tests/fixtures/docs/api-timeout.md
-Decision: PASS  (exit 0)
-Allowed wording: 根据现有证据可以判断 (judged from evidence)
-```
-
-这个例子能通过，是因为三个条件都成立：引文机械核验通过（那行字确实在
-文件里）、反证被核实排除（锁文件确认了版本）、声明强度与证据等级匹配。
-
-不妨亲手试两个变体：把引文改成 `"default timeout is 30 seconds"` 再运行
-同一命令，会得到 `ANCHOR_QUOTE_MISSING`，证据被降级，决策变为
-`VERIFY_REQUIRED (exit 10)`。或者保持引文不变、把结论改成"默认请求超时
-是 30 秒"——引文真实存在，但结论的数字不在任何引文里，v3 的
-`MISLEADING_QUOTE` 照样拦截。这就是"引用存在不等于引用支持"的机械执行。
 
 ## 示例
 
